@@ -1,19 +1,38 @@
 {
   "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqO9wYZGfxlWMljJFEns7R0/hFXpBLrriBnn577ixeHKLzLq676uJt3EbhtZqf6Q3ub5PVMCVLgKi2MgJiudaJhKEHbU2IK1B75Z5LyaoYsYYvuiX8htAg5DpKQH8tU4u/wgtCEdhY24bMZN+fIZBbvISTFKbu12yqVBGzA/YCqySqosU+evnQOzfCgxPsi01YU5SX1a0gVtxbS6KJqB2ruJYjDe8/q0MaZYbIgQh0Nnst/VztzOpugt1ZyPV/Z16HOyQCLxxiR7WDDCMDj9yAeG7vnhabyxQDXi50fKSYo7rwrGh1lyh270uPPOQCrQWvQztgnZL3VdamZFmAGmBvQIDAQAB",
   "name": "Sticky Notes Sync",
-  "version": "0.1.0",
-  "description": "Quick formatted notes in folders, synced to your own Google Sheet.",
+  "version": "1.0.0",
+  "description": "Quick formatted notes in folders, synced to a Google Sheet in your own Drive.",
   "action": {
     "default_title": "Sticky Notes Sync",
-    "default_popup": "src/popup/popup.html"
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png",
+      "48": "assets/icons/icon-48.png"
+    }
   },
   "background": {
     "service_worker": "src/background.js",
     "type": "module"
   },
-  "permissions": ["storage", "alarms", "clipboardWrite"],
+  "permissions": [
+    "storage",
+    "alarms",
+    "identity",
+    "clipboardWrite"
+  ],
   "host_permissions": [
-    "https://script.google.com/*",
-    "https://script.googleusercontent.com/*"
-  ]
+    "https://www.googleapis.com/*",
+    "https://sheets.googleapis.com/*",
+    "https://openidconnect.googleapis.com/*",
+    "https://oauth2.googleapis.com/*"
+  ],
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  }
 }

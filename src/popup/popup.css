@@ -68,15 +68,16 @@ svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width:
 .header-actions { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
 .header-actions .divider { width: 1px; height: 20px; background: rgba(255,255,255,.25); margin: 0 4px; }
 .sync {
-  display: inline-flex; align-items: center; gap: 6px; color: #fff; font-size: 12px; border: 0; background: transparent;
+  white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; color: #fff; font-size: 12px; border: 0; background: transparent;
   padding: 0 8px; height: 32px; min-width: 118px; border-radius: 6px; cursor: default;
 }
-.sync[data-state="error"] { cursor: pointer; }
-.sync[data-state="error"]:hover { background: rgba(255,255,255,.14); }
+.sync[data-state="error"], .sync[data-state="signin"], .sync[data-state="drive"], .sync[data-state="off"] { cursor: pointer; }
+.sync[data-state="error"]:hover, .sync[data-state="signin"]:hover, .sync[data-state="drive"]:hover, .sync[data-state="off"]:hover { background: rgba(255,255,255,.14); }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: #7ee08a; }
 .sync[data-state="off"] .dot { background: #aab4c4; }
 .sync[data-state="syncing"] .dot { background: #ffd54f; animation: pulse 1s infinite; }
 .sync[data-state="error"] .dot { background: #ff8a8a; }
+.sync[data-state="signin"] .dot, .sync[data-state="drive"] .dot { background: #ffb74d; }
 @keyframes pulse { 50% { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
@@ -156,7 +157,7 @@ svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width:
 .note .body::-webkit-scrollbar-thumb { background: var(--brand-300); border-radius: 3px; }
 .note:hover .body::-webkit-scrollbar-thumb, .note:focus-within .body::-webkit-scrollbar-thumb { background: var(--brand-500); }
 .note .body a { color: #1a73e8; cursor: pointer; }
-.note .body:empty::before { content: "Gõ hoặc dán ghi chú…"; color: var(--placeholder); }
+.note .body:empty::before { content: "Type or paste a note…"; color: var(--placeholder); }
 .note .overlay {
   position: absolute; inset: 0; background: rgba(255,255,255,.95); border-radius: 8px;
   display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
@@ -176,14 +177,24 @@ svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width:
   background: linear-gradient(90deg, var(--brand-900), var(--brand-700));
 }
 .settings .top h2 { font-size: 15px; margin: 0; flex: 1; }
-.settings form { padding: 16px; display: flex; flex-direction: column; gap: 14px; max-width: 560px; }
-.settings .row { display: flex; gap: 8px; align-items: center; }
-.field label { display: block; font-weight: 600; margin-bottom: 4px; }
-.field input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font: inherit; background: #fff; }
-.field .help { color: var(--muted); font-size: 12px; margin-top: 4px; }
+.account { padding: 20px 24px; display: flex; flex-direction: column; gap: 12px; max-width: 600px; }
+.account section { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.account p { margin: 0; }
+.account .lead { font-size: 15px; }
+.account .help { color: var(--muted); font-size: 12px; }
+.account .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.confirm-box { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); }
+/* Sign in with Google button per Google's branding guidelines (light theme). */
+.gsi {
+  display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px;
+  background: #fff; color: #1f1f1f; border: 1px solid #747775; border-radius: 4px;
+  font: 500 14px/20px Roboto, Arial, sans-serif; letter-spacing: .25px;
+}
+.gsi:hover { background: #f8f9fa; box-shadow: 0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15); }
+.gsi .g-logo { width: 20px; height: 20px; stroke: none; }
 .result { font-size: 13px; }
 .result.ok { color: var(--ok); }
 .result.err { color: var(--danger); }
-.settings .foot { color: var(--muted); font-size: 12px; }
+.settings .foot { color: var(--muted); font-size: 11px; margin-top: 8px; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

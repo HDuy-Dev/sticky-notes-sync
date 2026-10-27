@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <title>Sticky Notes Sync</title>
@@ -8,37 +8,37 @@
 <body>
 <div class="popup" id="popup">
   <div class="header">
-    <div class="tabs" id="tabs" role="tablist" aria-label="Thư mục"></div>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Folders"></div>
     <div class="header-actions">
-      <button class="icon-btn" id="addFolder" title="Thêm thư mục" aria-label="Thêm thư mục"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
-      <button class="icon-btn" id="delFolder" title="Xóa thư mục đang chọn" aria-label="Xóa thư mục đang chọn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+      <button class="icon-btn" id="addFolder" title="Add folder" aria-label="Add folder"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="icon-btn" id="delFolder" title="Delete this folder" aria-label="Delete this folder"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
       <span class="divider"></span>
-      <button class="sync" id="sync" data-state="off" title="Chưa cấu hình Google Sheet"><span class="dot"></span><span id="syncText">Chưa đồng bộ</span></button>
-      <button class="icon-btn" id="openSettings" title="Cài đặt đồng bộ" aria-label="Cài đặt đồng bộ"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+      <button class="sync" id="sync" data-state="off" title="Sign in with Google to sync your notes"><span class="dot"></span><span id="syncText">Not synced</span></button>
+      <button class="icon-btn" id="openSettings" title="Account" aria-label="Account"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
     </div>
   </div>
 
   <div class="confirm-bar" id="folderConfirm" role="alertdialog" aria-labelledby="folderConfirmText">
     <span id="folderConfirmText"></span>
-    <button class="btn" id="folderCancel">Hủy</button>
-    <button class="btn danger" id="folderOk">Xóa thư mục</button>
+    <button class="btn" id="folderCancel">Cancel</button>
+    <button class="btn danger" id="folderOk">Delete folder</button>
   </div>
 
-  <div class="toolbar" id="toolbar" role="toolbar" aria-label="Định dạng">
-    <button class="tb" data-cmd="bold" title="Đậm (Ctrl/Cmd+B)" aria-label="Đậm" aria-pressed="false">B</button>
-    <button class="tb" data-cmd="italic" title="Nghiêng (Ctrl/Cmd+I)" aria-label="Nghiêng" aria-pressed="false"><i>I</i></button>
-    <button class="tb" data-cmd="underline" title="Gạch chân (Ctrl/Cmd+U)" aria-label="Gạch chân" aria-pressed="false"><u>U</u></button>
+  <div class="toolbar" id="toolbar" role="toolbar" aria-label="Formatting">
+    <button class="tb" data-cmd="bold" title="Bold (Ctrl/Cmd+B)" aria-label="Bold" aria-pressed="false">B</button>
+    <button class="tb" data-cmd="italic" title="Italic (Ctrl/Cmd+I)" aria-label="Italic" aria-pressed="false"><i>I</i></button>
+    <button class="tb" data-cmd="underline" title="Underline (Ctrl/Cmd+U)" aria-label="Underline" aria-pressed="false"><u>U</u></button>
     <span class="sep"></span>
     <span id="swatches" class="swatches"></span>
     <span class="sep"></span>
-    <button class="tb" data-cmd="link" title="Chèn link (Ctrl/Cmd+K)" aria-label="Chèn link"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button>
-    <button class="tb" data-cmd="removeFormat" title="Xóa định dạng" aria-label="Xóa định dạng"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/><path d="M3 3l18 18"/></svg></button>
-    <span class="hint" id="tbHint">Chọn một note để định dạng</span>
-    <button class="add-note" id="addNote"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span id="addNoteText">Thêm note</span></button>
+    <button class="tb" data-cmd="link" title="Insert link (Ctrl/Cmd+K)" aria-label="Insert link"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button>
+    <button class="tb" data-cmd="removeFormat" title="Clear formatting" aria-label="Clear formatting"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/><path d="M3 3l18 18"/></svg></button>
+    <span class="hint" id="tbHint">Select a note to format</span>
+    <button class="add-note" id="addNote"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span id="addNoteText">Add note</span></button>
     <div class="link-pop" id="linkPop">
-      <input id="linkInput" placeholder="https://…" aria-label="Địa chỉ link">
-      <button class="btn primary" id="linkOk">Chèn</button>
-      <button class="btn" id="linkCancel">Hủy</button>
+      <input id="linkInput" placeholder="https://…" aria-label="Link address">
+      <button class="btn primary" id="linkOk">Insert</button>
+      <button class="btn" id="linkCancel">Cancel</button>
     </div>
   </div>
 
@@ -46,27 +46,48 @@
 
   <div class="settings" id="settings" role="dialog" aria-labelledby="settingsTitle">
     <div class="top">
-      <button class="icon-btn" id="closeSettings" aria-label="Quay lại"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <h2 id="settingsTitle">Cài đặt đồng bộ Google Sheet</h2>
+      <button class="icon-btn" id="closeSettings" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h2 id="settingsTitle">Account</h2>
     </div>
-    <form id="settingsForm">
-      <div class="field">
-        <label for="url">URL Apps Script (Web App)</label>
-        <input id="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off">
-        <div class="help">Lấy sau khi Deploy script trong Google Sheet của bạn. Xem hướng dẫn trong README.</div>
+    <div class="account">
+      <section id="signedOut">
+        <p class="lead">Sync your notes to a Google Sheet in your own Drive, and see them on every computer you sign in to.</p>
+        <button class="gsi" id="signIn" type="button"><svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span>Sign in with Google</span></button>
+        <p class="help">Sticky Notes Sync can only access files it creates. Your notes are never sent to anyone else.</p>
+      </section>
+      <section id="signedIn" hidden>
+        <p class="lead">Signed in as <b id="email"></b></p>
+        <div class="row">
+          <button class="btn primary" id="openSheet" type="button">Open Google Sheet</button>
+          <button class="btn" id="signOut" type="button">Sign out</button>
+        </div>
+      </section>
+      <div class="confirm-box" id="signOutConfirm" role="alertdialog" aria-labelledby="signOutText" hidden>
+        <p id="signOutText"></p>
+        <p class="help">Your notes stay in your Google Sheet either way.</p>
+        <div class="row">
+          <button class="btn" id="signOutKeep" type="button">Keep notes on this device</button>
+          <button class="btn danger" id="signOutRemove" type="button">Remove notes from this device</button>
+          <button class="btn" id="signOutCancel" type="button">Cancel</button>
+        </div>
       </div>
-      <div class="field">
-        <label for="secret">Mã bí mật</label>
-        <input id="secret" type="password" placeholder="Giống mã đã đặt trong script" autocomplete="off">
-        <div class="help">Script sẽ từ chối mọi yêu cầu không có đúng mã này.</div>
+      <div class="confirm-box" id="driveHelp" role="alertdialog" aria-labelledby="driveHelpTitle" hidden>
+        <p id="driveHelpTitle"><b>Google Drive access is needed to sync</b></p>
+        <p>On the Google screen, tick <b>"See, edit, create and delete only the specific Google Drive files you use with this app"</b>. Sticky Notes Sync can't see any other file in your Drive.</p>
+        <div class="row">
+          <button class="btn primary" id="driveRetry" type="button">Try again</button>
+        </div>
       </div>
-      <div class="row">
-        <button class="btn primary" id="saveSettings" type="submit">Lưu</button>
-        <button class="btn" id="testConn" type="button">Kiểm tra kết nối</button>
-        <span class="result" id="testResult" aria-live="polite"></span>
+      <div class="confirm-box" id="switchConfirm" role="alertdialog" aria-labelledby="switchText" hidden>
+        <p id="switchText"></p>
+        <div class="row">
+          <button class="btn primary" id="switchContinue" type="button">Continue</button>
+          <button class="btn" id="switchCancel" type="button">Cancel</button>
+        </div>
       </div>
-      <div class="foot">Chưa cấu hình thì note vẫn lưu trong trình duyệt bình thường, chỉ không đồng bộ.</div>
-    </form>
+      <p class="result" id="accountResult" aria-live="polite"></p>
+      <p class="foot">Not affiliated with Google. Google Sheets and Google Drive are trademarks of Google LLC.</p>
+    </div>
   </div>
   <div class="sr-only" id="live" aria-live="polite"></div>
 </div>

@@ -1,9 +1,12 @@
 // Service worker: the only writer of note data. The popup sends mutations
 // here; they are applied one at a time so concurrent writes never clobber.
 
+import { GOOGLE_CLIENT_ID } from './config.js';
 import { applyMutation, defaultState } from './lib/model.js';
-import { createSyncer } from './lib/sync.js';
 import { hasPushable } from './lib/merge.js';
+import { createAuth } from './lib/google-auth.js';
+import { createSheetsStore } from './lib/sheets-store.js';
+import { createSyncer } from './lib/sync.js';
 
 const PUSH_DELAY_MS = 2000;
 const ALARM = 'sync';
@@ -32,11 +35,6 @@ function updateState(fn) {
   });
 }
 
-async function getConfig() {
-  const { config } = await chrome.storage.local.get('config');
-  return config || null;
-}
-
 async function getStatus() {
   const { syncStatus } = await chrome.storage.local.get('syncStatus');
   return { status: 'off', lastSyncAt: null, error: null, tooLong: [], ...syncStatus };
@@ -46,12 +44,28 @@ async function setStatus(patch) {
   await chrome.storage.local.set({ syncStatus: { ...(await getStatus()), ...patch } });
 }
 
+const auth = createAuth({
+  identity: chrome.identity,
+  session: chrome.storage.session,
+  local: chrome.storage.local,
+  fetchFn: (url, init) => fetch(url, init),
+  clientId: GOOGLE_CLIENT_ID,
+  now: () => Date.now(),
+});
+
+const store = createSheetsStore({
+  fetchFn: (url, init) => fetch(url, init),
+  getToken: () => auth.getToken({ interactive: false }),
+  onUnauthorized: () => auth.invalidate(),
+});
+
 const syncer = createSyncer({
   readState,
   updateState,
-  getConfig,
   setStatus,
-  fetchFn: (url, init) => fetch(url, init),
+  auth,
+  store,
+  local: chrome.storage.local,
   now: () => Date.now(),
 });
 
@@ -64,8 +78,11 @@ function schedulePush() {
 async function handle(msg) {
   switch (msg?.type) {
     case 'getState': {
-      const [state, config, status] = await Promise.all([readState(), getConfig(), getStatus()]);
-      return { state, config, status };
+      const [state, status, account, { sheet }] = await Promise.all([
+        readState(), getStatus(), auth.getAccount(), chrome.storage.local.get('sheet'),
+      ]);
+      const sheetUrl = account && sheet?.email === account.email ? store.url(sheet.spreadsheetId) : null;
+      return { state, status, account, sheetUrl, pendingSignIn: syncer.pendingSignIn() };
     }
     case 'mutate': {
       let error = null;
@@ -84,12 +101,14 @@ async function handle(msg) {
     case 'syncNow':
       await syncer.syncOnce();
       return { ok: true };
-    case 'saveConfig':
-      await chrome.storage.local.set({ config: { url: msg.config.url.trim(), secret: msg.config.secret } });
-      syncer.syncOnce();
-      return { ok: true };
-    case 'testConnection':
-      return syncer.testConnection({ url: msg.config.url.trim(), secret: msg.config.secret });
+    case 'signIn':
+      return syncer.signIn({ forceConsent: Boolean(msg.forceConsent) });
+    case 'confirmSignIn':
+      return syncer.confirmSignIn();
+    case 'cancelSignIn':
+      return syncer.cancelSignIn();
+    case 'signOut':
+      return syncer.signOut(msg.keepNotes !== false);
     default:
       return { ok: false, error: 'unknown_message' };
   }

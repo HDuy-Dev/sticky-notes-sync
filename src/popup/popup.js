@@ -12,7 +12,6 @@ const ICON_TRASH = '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>';
 
 let state = null;
 let status = { status: 'off', tooLong: [] };
-let config = null;
 let activeId = null;
 let renamingId = null;
 const noteEls = new Map(); // note id -> element, reused across renders
@@ -34,7 +33,7 @@ function loadActive() {
 
 async function mutate(mutation) {
   const res = await send({ type: 'mutate', mutation });
-  if (!res?.ok) announce('Không thực hiện được thao tác');
+  if (!res?.ok) announce('That action could not be completed');
   return res;
 }
 
@@ -102,7 +101,7 @@ function renderTabs() {
       const input = document.createElement('input');
       input.value = f.name;
       input.maxLength = 30;
-      input.setAttribute('aria-label', 'Tên thư mục');
+      input.setAttribute('aria-label', 'Folder name');
       let closed = false;
       const done = save => {
         if (closed) return;
@@ -131,7 +130,7 @@ function renderTabs() {
     name.setAttribute('role', 'tab');
     name.setAttribute('aria-selected', String(f.id === activeId));
     name.tabIndex = f.id === activeId ? 0 : -1;
-    name.title = f.id === activeId ? 'Nhấp đúp để đổi tên' : f.name;
+    name.title = f.id === activeId ? 'Double-click to rename' : f.name;
     name.addEventListener('click', () => selectFolder(f.id));
     name.addEventListener('dblclick', () => startRename(f.id));
     name.addEventListener('keydown', e => {
@@ -146,8 +145,8 @@ function renderTabs() {
 
     const rename = document.createElement('button');
     rename.className = 'rename';
-    rename.title = 'Đổi tên (F2)';
-    rename.setAttribute('aria-label', `Đổi tên thư mục ${f.name}`);
+    rename.title = 'Rename (F2)';
+    rename.setAttribute('aria-label', `Rename folder ${f.name}`);
     rename.innerHTML = icon(ICON_PEN);
     rename.addEventListener('click', () => startRename(f.id));
 
@@ -158,7 +157,7 @@ function renderTabs() {
 
   const onlyOne = folders.length <= 1;
   $('delFolder').disabled = onlyOne;
-  $('delFolder').title = onlyOne ? 'Cần giữ ít nhất 1 thư mục' : 'Xóa thư mục đang chọn';
+  $('delFolder').title = onlyOne ? 'Keep at least one folder' : 'Delete this folder';
 }
 
 $('addFolder').addEventListener('click', async () => {
@@ -174,7 +173,7 @@ $('delFolder').addEventListener('click', () => {
   const folder = state.folders[activeId];
   if (!folder || currentFolders().length <= 1) return;
   const count = liveNotes(state, activeId).length;
-  $('folderConfirmText').textContent = `Xóa thư mục "${folder.name}" và ${count} note bên trong? Không thể hoàn tác.`;
+  $('folderConfirmText').textContent = `Delete folder "${folder.name}" and its ${count} ${count === 1 ? 'note' : 'notes'}? This can't be undone.`;
   $('folderConfirm').classList.add('show');
   $('folderCancel').focus();
 });
@@ -197,7 +196,7 @@ $('folderOk').addEventListener('click', async () => {
   const res = await mutate({ type: 'deleteFolder', id: activeId });
   if (res?.ok) {
     selectFolder(nextId);
-    announce(`Đã xóa thư mục ${name}`);
+    announce(`Deleted folder ${name}`);
   }
 });
 
@@ -213,21 +212,21 @@ function buildNote(note) {
   label.className = 'label';
   const copied = document.createElement('span');
   copied.className = 'copied';
-  copied.textContent = 'Đã copy';
+  copied.textContent = 'Copied';
   copied.hidden = true;
   const copy = document.createElement('button');
   copy.className = 'act copy';
-  copy.title = 'Copy toàn bộ note';
+  copy.title = 'Copy note';
   copy.innerHTML = icon(ICON_COPY);
   const del = document.createElement('button');
   del.className = 'act del';
-  del.title = 'Xóa note';
+  del.title = 'Delete note';
   del.innerHTML = icon(ICON_TRASH);
   head.append(label, copied, copy, del);
 
   const tooLong = document.createElement('div');
   tooLong.className = 'too-long';
-  tooLong.textContent = 'Note quá dài (>45.000 ký tự), không đồng bộ được lên Sheet.';
+  tooLong.textContent = 'Note too long (over 45,000 characters) — not synced.';
   tooLong.hidden = true;
 
   const body = document.createElement('div');
@@ -243,7 +242,7 @@ function buildNote(note) {
   const overlay = document.createElement('div');
   overlay.className = 'overlay';
   overlay.setAttribute('role', 'alertdialog');
-  overlay.innerHTML = '<div>Xóa note này?</div><div class="row"><button class="btn">Hủy</button><button class="btn danger">Xóa</button></div>';
+  overlay.innerHTML = '<div>Delete this note?</div><div class="row"><button class="btn">Cancel</button><button class="btn danger">Delete</button></div>';
   const [cancel, ok] = overlay.querySelectorAll('button');
   const closeOverlay = () => { overlay.classList.remove('show'); del.focus(); };
   del.addEventListener('click', () => { overlay.classList.add('show'); cancel.focus(); });
@@ -253,13 +252,13 @@ function buildNote(note) {
     clearTimeout(pendingSaves.get(note.id));
     pendingSaves.delete(note.id);
     const res = await mutate({ type: 'deleteNote', id: note.id });
-    if (res?.ok) announce('Đã xóa note');
+    if (res?.ok) announce('Note deleted');
   });
 
   copy.addEventListener('click', async () => {
     await editor.copy(body);
     copied.hidden = false;
-    announce('Đã copy note');
+    announce('Note copied');
     setTimeout(() => { copied.hidden = true; }, 1200);
   });
 
@@ -271,10 +270,10 @@ function updateNote(el, note, index) {
   const n = index + 1;
   el.querySelector('.label').textContent = `Note ${n}`;
   el.querySelector('.copy').setAttribute('aria-label', `Copy note ${n}`);
-  el.querySelector('.del').setAttribute('aria-label', `Xóa note ${n}`);
+  el.querySelector('.del').setAttribute('aria-label', `Delete note ${n}`);
   el.querySelector('.too-long').hidden = !status.tooLong?.includes(note.id);
   const body = el.querySelector('.body');
-  body.setAttribute('aria-label', `Nội dung note ${n}`);
+  body.setAttribute('aria-label', `Note ${n} content`);
   // Never overwrite what the user is typing or has not saved yet.
   if (document.activeElement === body || pendingSaves.has(note.id)) return;
   const html = sanitizeHtml(note.html);
@@ -308,15 +307,15 @@ function renderGrid() {
   if (!notes.length) {
     const empty = document.createElement('div');
     empty.className = 'empty-folder';
-    empty.innerHTML = '<b>Thư mục trống</b><span>Bấm "Thêm note" để bắt đầu ghi chú.</span>';
+    empty.innerHTML = '<b>Empty folder</b><span>Click "Add note" to start writing.</span>';
     grid.append(empty);
   }
   grid.style.setProperty('--cols', Math.max(notes.length, 1));
 
   const full = notes.length >= MAX_NOTES;
   $('addNote').disabled = full;
-  $('addNoteText').textContent = full ? `Đủ ${MAX_NOTES}/${MAX_NOTES} note` : `Thêm note (${notes.length}/${MAX_NOTES})`;
-  $('addNote').title = full ? `Mỗi thư mục tối đa ${MAX_NOTES} note` : '';
+  $('addNoteText').textContent = full ? `${MAX_NOTES}/${MAX_NOTES} notes` : `Add note (${notes.length}/${MAX_NOTES})`;
+  $('addNote').title = full ? `A folder holds up to ${MAX_NOTES} notes` : '';
 }
 
 let focusNoteId = null;
@@ -327,12 +326,18 @@ $('addNote').addEventListener('click', async () => {
   await mutate({ type: 'addNote', id, folderId: activeId });
 });
 
-// ---- Sync status + settings ---------------------------------------------
+// ---- Sync status + account ----------------------------------------------
 
-const STATUS_TEXT = { off: 'Chưa đồng bộ', syncing: 'Đang đồng bộ…', idle: 'Đã đồng bộ', error: 'Lỗi đồng bộ' };
+let account = null;
+let sheetUrl = null;
+
+const STATUS_TEXT = {
+  off: 'Not synced', syncing: 'Syncing…', idle: 'Synced', error: 'Sync error',
+  signin: 'Sign in again', drive: 'Allow Drive access',
+};
 
 function formatTime(ms) {
-  return new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 function renderStatus() {
@@ -341,88 +346,125 @@ function renderStatus() {
   chip.dataset.state = s;
   $('syncText').textContent = STATUS_TEXT[s];
   chip.title = {
-    off: 'Chưa cấu hình Google Sheet',
-    syncing: 'Đang đồng bộ với Google Sheet',
-    idle: status.lastSyncAt ? `Đã đồng bộ với Google Sheet lúc ${formatTime(status.lastSyncAt)}` : 'Đã đồng bộ',
-    error: `${status.error || 'Lỗi không rõ'} — bấm để thử lại`,
+    off: 'Sign in with Google to sync your notes',
+    syncing: 'Syncing with your Google Sheet',
+    idle: status.lastSyncAt ? `Synced at ${formatTime(status.lastSyncAt)}` : 'Synced',
+    error: `${status.error || 'Unknown error'} — click to retry`,
+    signin: 'Your Google session expired — click to sign in again',
+    drive: 'Sticky Notes Sync needs access to its own files in Google Drive — click to allow',
   }[s];
 }
 
 $('sync').addEventListener('click', () => {
   if (status.status === 'error') send({ type: 'syncNow' });
+  else if (status.status === 'signin') signIn();
+  else if (status.status === 'drive') signIn({ forceConsent: true });
+  else if (status.status === 'off') openAccount();
 });
 
-function showResult(ok, text) {
-  const r = $('testResult');
-  r.className = 'result ' + (ok ? 'ok' : 'err');
+function accountMessage(text, kind = '') {
+  const r = $('accountResult');
+  r.className = `result ${kind}`;
   r.textContent = text;
 }
 
-function formConfig() {
-  return { url: $('url').value.trim(), secret: $('secret').value };
+function showOnly(id) {
+  for (const box of ['signOutConfirm', 'switchConfirm', 'driveHelp']) $(box).hidden = box !== id;
 }
 
-// Unsaved settings are kept as a draft so closing the popup loses nothing.
-let draft = null;
-const sameConfig = (a, b) => (a?.url || '') === (b?.url || '') && (a?.secret || '') === (b?.secret || '');
-const hasDraft = () => Boolean(draft) && !sameConfig(draft, config);
-
-function saveDraft() {
-  draft = formConfig();
-  if (hasDraft()) chrome.storage.local.set({ configDraft: draft });
-  else chrome.storage.local.remove('configDraft');
+function renderAccount(pending) {
+  $('signedOut').hidden = Boolean(account);
+  $('signedIn').hidden = !account;
+  if (account) {
+    $('email').textContent = account.email;
+    $('openSheet').disabled = !sheetUrl;
+    $('openSheet').title = sheetUrl ? '' : 'Available after the first sync';
+  }
+  if (pending) {
+    $('switchText').textContent = `Notes on this device will be added to the Google Sheet of ${pending.email}.`;
+    showOnly('switchConfirm');
+  } else if ($('switchConfirm').hidden === false) {
+    showOnly(null);
+  }
 }
 
-function clearDraft() {
-  draft = null;
-  chrome.storage.local.remove('configDraft');
+async function refreshAccount() {
+  const res = await send({ type: 'getState' });
+  account = res.account;
+  sheetUrl = res.sheetUrl;
+  renderAccount(res.pendingSignIn);
+  return res;
 }
 
-$('url').addEventListener('input', saveDraft);
-$('secret').addEventListener('input', saveDraft);
-
-function openSettings() {
-  const values = hasDraft() ? draft : config;
-  $('url').value = values?.url || '';
-  $('secret').value = values?.secret || '';
-  const r = $('testResult');
-  r.className = 'result';
-  r.textContent = hasDraft() ? 'Bản nháp chưa lưu — bấm Lưu để áp dụng' : '';
+function openAccount() {
+  accountMessage('');
   $('settings').classList.add('show');
-  $('url').focus();
+  (account ? $('openSheet') : $('signIn')).focus();
 }
 
-function closeSettings() {
+function closeAccount() {
+  showOnly(null);
   $('settings').classList.remove('show');
   $('openSettings').focus();
 }
 
-$('openSettings').addEventListener('click', openSettings);
-$('closeSettings').addEventListener('click', closeSettings);
-$('settings').addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeSettings();
-});
-
-$('settingsForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const next = formConfig();
-  if (next.url && !/^https:\/\/script\.google(usercontent)?\.com\//.test(next.url)) {
-    showResult(false, '✗ URL phải là link Apps Script (https://script.google.com/…/exec)');
-    return;
+async function signIn({ forceConsent = false } = {}) {
+  openAccount();
+  showOnly(null);
+  accountMessage('Opening Google sign-in…');
+  const res = await send({ type: 'signIn', forceConsent });
+  if (res?.needsDrive) {
+    accountMessage('');
+    showOnly('driveHelp');
+  } else if (res?.needsConfirm) {
+    accountMessage('');
+    renderAccount({ email: res.email });
+  } else if (res?.ok) {
+    accountMessage(`Signed in as ${res.email}`, 'ok');
+  } else {
+    accountMessage(res?.error || 'Sign-in failed', 'err');
   }
-  await send({ type: 'saveConfig', config: next });
-  config = next;
-  clearDraft();
-  showResult(true, '✓ Đã lưu');
+  await refreshAccount();
+}
+
+$('openSettings').addEventListener('click', openAccount);
+$('closeSettings').addEventListener('click', closeAccount);
+// Focus may have left the panel (e.g. after the Google sign-in window).
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('settings').classList.contains('show')) closeAccount();
+});
+$('signIn').addEventListener('click', () => signIn());
+$('driveRetry').addEventListener('click', () => signIn({ forceConsent: true }));
+$('openSheet').addEventListener('click', () => {
+  if (sheetUrl) chrome.tabs.create({ url: sheetUrl });
 });
 
-$('testConn').addEventListener('click', async () => {
-  const r = $('testResult');
-  r.className = 'result';
-  r.textContent = 'Đang kiểm tra…';
-  const res = await send({ type: 'testConnection', config: formConfig() });
-  if (res?.ok) showResult(true, `✓ Kết nối được: ${res.folders} thư mục, ${res.notes} note`);
-  else showResult(false, `✗ ${res?.error || 'Lỗi không rõ'}`);
+$('signOut').addEventListener('click', () => {
+  $('signOutText').textContent = `Sign out of ${account?.email}?`;
+  showOnly('signOutConfirm');
+  $('signOutCancel').focus();
+});
+$('signOutCancel').addEventListener('click', () => showOnly(null));
+for (const [id, keepNotes] of [['signOutKeep', true], ['signOutRemove', false]]) {
+  $(id).addEventListener('click', async () => {
+    showOnly(null);
+    await send({ type: 'signOut', keepNotes });
+    accountMessage(keepNotes ? 'Signed out. Your notes stay on this device.' : 'Signed out and removed notes from this device.', 'ok');
+    await refreshAccount();
+  });
+}
+
+$('switchContinue').addEventListener('click', async () => {
+  showOnly(null);
+  const res = await send({ type: 'confirmSignIn' });
+  accountMessage(res?.ok ? `Signed in as ${res.email}` : res?.error || 'Sign-in failed', res?.ok ? 'ok' : 'err');
+  await refreshAccount();
+});
+$('switchCancel').addEventListener('click', async () => {
+  showOnly(null);
+  await send({ type: 'cancelSignIn' });
+  accountMessage('Sign-in cancelled.');
+  await refreshAccount();
 });
 
 // ---- Render -------------------------------------------------------------
@@ -442,22 +484,20 @@ function render() {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
-  if (changes.config) config = changes.config.newValue || null;
   if (changes.syncStatus) status = changes.syncStatus.newValue || status;
   if (changes.state?.newValue) state = changes.state.newValue;
   if (state && (changes.state || changes.syncStatus)) render();
+  if (changes.account || changes.sheet) refreshAccount();
 });
 
 async function init() {
-  const res = await send({ type: 'getState' });
+  const res = await refreshAccount();
   state = res.state;
   status = res.status;
-  config = res.config;
-  ({ configDraft: draft = null } = await chrome.storage.local.get('configDraft'));
   activeId = loadActive();
   render();
-  // Bring back unfinished settings right where the user left them.
-  if (hasDraft()) openSettings();
+  // A different-account question left open when the popup closed.
+  if (res.pendingSignIn) openAccount();
   send({ type: 'syncNow' });
 }
 

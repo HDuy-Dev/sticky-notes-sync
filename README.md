@@ -1,48 +1,41 @@
 # Sticky Notes Sync
 
-Chrome extension ghi note nhanh có định dạng, chia theo thư mục (mỗi thư mục tối đa 3 note), lưu trong trình duyệt và đồng bộ lên Google Sheet của chính bạn.
+Quick formatted notes in your browser, synced to a Google Sheet in your own Google Drive.
 
-## 1. Cài extension
+![Sticky Notes Sync](store/screenshot-1.png)
 
-1. Mở `chrome://extensions`, bật **Developer mode** (góc phải trên).
-2. Bấm **Load unpacked** và chọn thư mục `sticky-notes-sync` này.
-3. Ghim icon extension lên thanh công cụ (biểu tượng mảnh ghép → ghim).
+- Folder tabs with up to three side-by-side notes each
+- Bold, italic, underline, text colors and clickable links; pasting keeps simple formatting
+- Saves automatically and works offline
+- **Sign in with Google** to sync between computers. The extension creates a "Sticky Notes Sync" spreadsheet in your Drive and can only access files it created
+- Works in Chromium browsers: Chrome, Edge, Brave, Cốc Cốc…
 
-Chưa cấu hình Google Sheet thì note vẫn lưu trong trình duyệt bình thường, chỉ không đồng bộ.
+Privacy: [PRIVACY.md](PRIVACY.md). No developer servers, no analytics.
 
-## 2. Tạo Google Sheet và script đồng bộ
+## Install for development
 
-1. Tạo một Google Sheet mới (ví dụ tên "Sticky Notes").
-2. Trong Sheet: **Extensions → Apps Script**.
-3. Xóa nội dung có sẵn trong `Code.gs`, dán toàn bộ nội dung file [`apps-script/Code.gs`](apps-script/Code.gs) vào.
-4. Sửa dòng `const SECRET = 'CHANGE_ME';` thành một mã bí mật của bạn (dài, khó đoán). Bấm **Save**.
-5. Bấm **Deploy → New deployment**:
-   - Select type: **Web app**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-6. Bấm **Deploy**, cấp quyền khi Google hỏi (chọn tài khoản → Advanced → Go to … → Allow).
-7. Copy **Web app URL** (kết thúc bằng `/exec`).
+1. Open `chrome://extensions` and turn on **Developer mode**.
+2. Click **Load unpacked** and choose this folder.
+3. Sign-in needs your own Google OAuth client; follow [docs/PUBLISHING.md](docs/PUBLISHING.md) steps 1–3 and put the client ID in `src/config.js`. Without it, notes still work locally.
 
-## 3. Kết nối extension với Sheet
+## How sync works
 
-1. Mở popup extension → bấm biểu tượng bánh răng **Cài đặt đồng bộ**.
-2. Dán URL `/exec` và mã bí mật (giống hệt mã trong `Code.gs`).
-3. Bấm **Kiểm tra kết nối** → thấy `✓ Kết nối được: …` là ổn. Bấm **Lưu**.
+- The background service worker is the only writer of note data; the popup sends it changes.
+- Each sync reads the spreadsheet, merges it with local data (the newest edit of each folder or note wins), then writes only the rows this device changed. Deleted items are kept as `deleted` rows so other devices learn about them.
+- Sync runs about 2 seconds after an edit and retries every minute while something is still unsynced.
 
-Sheet sẽ có 2 trang tính: `Folders` và `Notes`. Cột `text` của `Notes` là nội dung dạng chữ thường để bạn đọc nhanh, cột `html` giữ định dạng.
+Code map: `src/lib/model.js` (data and mutations), `merge.js` (last-write-wins), `sheet-rows.js` (rows ↔ records), `google-auth.js` (sign-in and token renewal), `sheets-store.js` (Drive/Sheets REST), `sync.js` (sync rounds, sign-in/out), `src/popup/` (UI).
 
-Ở trình duyệt/máy khác: cài extension như bước 1, nhập **cùng URL và mã bí mật** là thấy cùng note.
-
-## Lưu ý
-
-- **Bảo mật:** ai có cả URL `/exec` lẫn mã bí mật thì đọc được toàn bộ note. Đừng chia sẻ hai thứ này. Dữ liệu chỉ đi giữa trình duyệt và Google Sheet của bạn.
-- **Sửa script:** mỗi lần sửa `Code.gs` phải **Deploy → Manage deployments → Edit (bút chì) → Version: New version → Deploy** thì thay đổi mới có hiệu lực (URL giữ nguyên).
-- Sheet chỉ để xem/lưu. Sửa note trực tiếp trên Sheet sẽ **không** được kéo về extension.
-- Note dài hơn 45.000 ký tự (tính cả định dạng) không đồng bộ được, extension sẽ cảnh báo trên note đó.
-- Sửa cùng một note ở hai nơi: bản sửa sau cùng được giữ.
-
-## Phát triển
+## Tests
 
 ```sh
-npm test   # chạy test (Node ≥ 20, không cần cài thư viện)
+npm test   # Node ≥ 20, no dependencies
 ```
+
+## Publishing
+
+See [docs/PUBLISHING.md](docs/PUBLISHING.md) and the checklist in [docs/COMPLIANCE.md](docs/COMPLIANCE.md).
+
+## License
+
+[MIT](LICENSE)
