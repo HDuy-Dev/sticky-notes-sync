@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sticky Notes Mockup</title>
+<style>
+  :root {
+    --brand-900: #0b2a5b;
+    --brand-700: #1a4fa0;
+    --brand-500: #2f6fe0;
+    --brand-300: #c3d6f7;
+    --brand-100: #e6eefc;
+    --bg: #f2f5fa;
+    --card: #ffffff;
+    --text: #1b2230;
+    --muted: #5b6475;
+    --placeholder: #7d8596;
+    --disabled: #b4bac6;
+    --border: #d5deeb;
+    --focus: var(--brand-500);
+    --danger: #c62828;
+    --danger-bg: #fdecea;
+    --ok: #2e7d32;
+    --c-blue: #1a73e8; --c-red: #d93025; --c-green: #188038;
+    --c-orange: #e8710a; --c-purple: #8430ce; --c-gray: #5f6368;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: #d3d9e4;
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text); display: flex; flex-direction: column; align-items: center; padding: 24px 16px;
+  }
+  .caption { color: #3d4657; font-size: 13px; margin-bottom: 12px; text-align: center; }
+  .popup {
+    width: 780px; max-width: 100%; height: 560px; background: var(--bg);
+    display: flex; flex-direction: column; overflow: hidden; position: relative;
+    border-radius: 8px; box-shadow: 0 10px 30px rgba(11,42,91,.25);
+  }
+  button { font: inherit; cursor: pointer; }
+  button:disabled { cursor: default; }
+  button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--focus); outline-offset: 2px;
+  }
+  .header button:focus-visible, .settings .top button:focus-visible { outline-color: #fff; }
+  svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+  /* Header + folder tabs */
+  .header {
+    background: linear-gradient(90deg, var(--brand-900), var(--brand-700) 60%, var(--brand-500));
+    display: flex; align-items: flex-end; gap: 6px; padding: 8px 8px 0; min-height: 46px;
+  }
+  .tabs { display: flex; gap: 4px; align-items: flex-end; overflow-x: auto; flex: 1; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    display: flex; align-items: center; white-space: nowrap; border-radius: 6px 6px 0 0;
+    background: rgba(255,255,255,.14); color: #fff; transition: background .15s;
+  }
+  .tab:hover { background: rgba(255,255,255,.24); }
+  .tab .name {
+    border: 0; background: transparent; color: inherit; padding: 6px 12px; min-height: 32px;
+    font-size: 12px; font-weight: 600; letter-spacing: .3px; text-transform: uppercase;
+  }
+  .tab.active { background: var(--bg); color: var(--brand-900); }
+  .tab.active .name { font-size: 14px; min-height: 38px; padding-right: 4px; }
+  .tab .rename {
+    display: none; border: 0; background: transparent; color: var(--brand-700);
+    width: 28px; height: 28px; margin-right: 4px; border-radius: 4px; align-items: center; justify-content: center;
+  }
+  .tab.active .rename { display: inline-flex; }
+  .tab .rename:hover { background: var(--brand-100); }
+  .tab input {
+    font-family: inherit; font-size: 14px; font-weight: 600; text-transform: uppercase; width: 130px; margin: 4px 6px;
+    border: 1px solid var(--brand-500); border-radius: 4px; padding: 2px 6px; color: var(--brand-900);
+  }
+  .icon-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-width: 32px; height: 32px; border: 0; border-radius: 6px; padding: 0 8px;
+    background: rgba(255,255,255,.14); color: #fff; transition: background .15s;
+  }
+  .icon-btn:hover:not(:disabled) { background: rgba(255,255,255,.28); }
+  .icon-btn:disabled { opacity: .4; }
+  .header-actions { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+  .header-actions .divider { width: 1px; height: 20px; background: rgba(255,255,255,.25); margin: 0 4px; }
+  .sync {
+    display: inline-flex; align-items: center; gap: 6px; color: #fff; font-size: 12px;
+    padding: 0 8px; height: 32px; min-width: 118px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #7ee08a; }
+  .sync[data-state="syncing"] .dot { background: #ffd54f; animation: pulse 1s infinite; }
+  .sync[data-state="error"] .dot { background: #ff8a8a; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* Confirm bar */
+  .confirm-bar {
+    display: none; align-items: center; gap: 8px; padding: 8px 12px;
+    background: var(--danger-bg); color: var(--danger); font-size: 13px; border-bottom: 1px solid #f5c6c2;
+  }
+  .confirm-bar.show { display: flex; }
+  .confirm-bar span { flex: 1; }
+  .btn { border: 1px solid var(--border); background: #fff; color: var(--text); border-radius: 6px; padding: 4px 14px; min-height: 32px; }
+  .btn:hover { border-color: var(--brand-500); }
+  .btn.danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .btn.primary { background: var(--brand-700); color: #fff; border-color: var(--brand-700); }
+
+  /* Format toolbar */
+  .toolbar {
+    display: flex; align-items: center; gap: 2px; padding: 6px 10px; background: var(--card);
+    border-bottom: 1px solid var(--border); position: relative;
+  }
+  .toolbar .tb {
+    border: 0; background: transparent; color: var(--text); min-width: 32px; height: 32px; border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; transition: background .15s;
+  }
+  .toolbar .tb:hover:not(:disabled) { background: var(--brand-100); }
+  .toolbar .tb[aria-pressed="true"] { background: var(--brand-100); color: var(--brand-700); }
+  .toolbar .tb:disabled { color: var(--disabled); }
+  .toolbar .tb:disabled .swatch { opacity: .35; }
+  .toolbar .sep { width: 1px; height: 18px; background: var(--border); margin: 0 6px; }
+  .swatch { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--border); }
+  .toolbar .hint { margin-left: 12px; color: var(--muted); font-size: 12px; }
+  .add-note {
+    margin-left: auto; display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px;
+    border: 1px solid var(--border); border-radius: 6px; background: #fff; color: var(--brand-700); font-size: 13px; font-weight: 600;
+  }
+  .add-note:hover:not(:disabled) { border-color: var(--brand-500); background: var(--brand-100); }
+  .add-note:disabled { color: var(--disabled); font-weight: 400; }
+  .link-pop {
+    position: absolute; top: calc(100% + 4px); left: 160px; z-index: 5; display: none; gap: 6px; align-items: center;
+    background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 8px; box-shadow: 0 6px 20px rgba(11,42,91,.15);
+  }
+  .link-pop.show { display: flex; }
+  .link-pop input { width: 280px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font: inherit; }
+
+  /* Notes grid */
+  .grid {
+    flex: 1; min-height: 0; padding: 10px; display: grid;
+    grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); gap: 10px;
+  }
+  .note {
+    position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    min-height: 0; display: flex; flex-direction: column; transition: border-color .15s, box-shadow .15s;
+  }
+  .note:focus-within { border-color: var(--brand-500); box-shadow: 0 0 0 3px var(--brand-100); }
+  .note-head {
+    display: flex; align-items: center; gap: 2px; padding: 2px 4px 0 12px; height: 32px;
+    color: var(--muted); font-size: 12px;
+  }
+  .note-head .label { flex: 1; }
+  .note-head .act {
+    border: 0; background: transparent; color: var(--muted); width: 28px; height: 28px; border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center; opacity: .55; transition: opacity .15s, background .15s;
+  }
+  .note:hover .act, .note:focus-within .act, .note-head .act:focus-visible { opacity: 1; }
+  .note-head .act:hover { background: var(--brand-100); color: var(--brand-700); }
+  .note-head .act.del:hover { background: var(--danger-bg); color: var(--danger); }
+  .note-head .copied { color: var(--ok); font-size: 12px; margin-right: 4px; }
+  .note .body {
+    flex: 1; min-height: 0; overflow-y: auto; padding: 4px 6px 10px 12px; outline: none; word-break: break-word;
+    scrollbar-width: thin; scrollbar-color: var(--brand-300) transparent; scrollbar-gutter: stable;
+  }
+  .note:hover .body, .note:focus-within .body { scrollbar-color: var(--brand-500) transparent; }
+  .note .body::-webkit-scrollbar { width: 6px; }
+  .note .body::-webkit-scrollbar-track { background: transparent; margin: 4px 0; }
+  .note .body::-webkit-scrollbar-thumb { background: var(--brand-300); border-radius: 3px; }
+  .note:hover .body::-webkit-scrollbar-thumb, .note:focus-within .body::-webkit-scrollbar-thumb { background: var(--brand-500); }
+  .note .body a { color: var(--c-blue); }
+  .note .body:empty::before { content: "Gõ hoặc dán ghi chú…"; color: var(--placeholder); }
+  .note .overlay {
+    position: absolute; inset: 0; background: rgba(255,255,255,.95); border-radius: 8px;
+    display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  }
+  .note .overlay.show { display: flex; }
+  .empty-folder {
+    grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    color: var(--muted); border: 2px dashed var(--border); border-radius: 8px;
+  }
+
+  /* Settings panel */
+  .settings { position: absolute; inset: 0; background: var(--bg); display: none; flex-direction: column; }
+  .settings.show { display: flex; }
+  .settings .top {
+    display: flex; align-items: center; gap: 8px; padding: 10px 12px; color: #fff;
+    background: linear-gradient(90deg, var(--brand-900), var(--brand-700));
+  }
+  .settings .top h2 { font-size: 15px; margin: 0; flex: 1; }
+  .settings form { padding: 16px; display: flex; flex-direction: column; gap: 14px; max-width: 560px; }
+  .field label { display: block; font-weight: 600; margin-bottom: 4px; }
+  .field input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font: inherit; background: #fff; }
+  .field .help { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .result { font-size: 13px; }
+  .result.ok { color: var(--ok); }
+  .settings .foot { color: var(--muted); font-size: 12px; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="caption">Mockup popup 780×560 · màu xanh dương. Bấm thử: đổi tab (nhấp đúp để đổi tên), thêm/xóa thư mục, định dạng, copy note, xóa note, Cài đặt.</div>
+
+<div class="popup" id="popup">
+  <div class="header">
+    <div class="tabs" id="tabs" role="tablist" aria-label="Thư mục"></div>
+    <div class="header-actions">
+      <button class="icon-btn" id="addFolder" title="Thêm thư mục" aria-label="Thêm thư mục"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="icon-btn" id="delFolder" title="Xóa thư mục đang chọn" aria-label="Xóa thư mục đang chọn"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>
+      <span class="divider"></span>
+      <span class="sync" id="sync" data-state="ok" title="Đã đồng bộ với Google Sheet lúc 10:42"><span class="dot"></span><span id="syncText">Đã đồng bộ</span></span>
+      <button class="icon-btn" id="openSettings" title="Cài đặt đồng bộ" aria-label="Cài đặt đồng bộ"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </div>
+  </div>
+
+  <div class="confirm-bar" id="folderConfirm" role="alertdialog" aria-labelledby="folderConfirmText">
+    <span id="folderConfirmText"></span>
+    <button class="btn" id="folderCancel">Hủy</button>
+    <button class="btn danger" id="folderOk">Xóa thư mục</button>
+  </div>
+
+  <div class="toolbar" id="toolbar" role="toolbar" aria-label="Định dạng">
+    <button class="tb" data-cmd="bold" title="Đậm (Ctrl/Cmd+B)" aria-label="Đậm" aria-pressed="false">B</button>
+    <button class="tb" data-cmd="italic" title="Nghiêng (Ctrl/Cmd+I)" aria-label="Nghiêng" aria-pressed="false"><i>I</i></button>
+    <button class="tb" data-cmd="underline" title="Gạch chân (Ctrl/Cmd+U)" aria-label="Gạch chân" aria-pressed="false"><u>U</u></button>
+    <span class="sep"></span>
+    <span id="swatches" style="display:contents"></span>
+    <span class="sep"></span>
+    <button class="tb" data-cmd="link" title="Chèn link (Ctrl/Cmd+K)" aria-label="Chèn link"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></button>
+    <button class="tb" data-cmd="removeFormat" title="Xóa định dạng" aria-label="Xóa định dạng"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/><path d="M3 3l18 18"/></svg></button>
+    <span class="hint" id="tbHint">Chọn một note để định dạng</span>
+    <button class="add-note" id="addNote"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span id="addNoteText">Thêm note</span></button>
+    <div class="link-pop" id="linkPop">
+      <input id="linkInput" placeholder="https://…" aria-label="Địa chỉ link">
+      <button class="btn primary" id="linkOk">Chèn</button>
+      <button class="btn" id="linkCancel">Hủy</button>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="settings" id="settings" role="dialog" aria-labelledby="settingsTitle">
+    <div class="top">
+      <button class="icon-btn" id="closeSettings" aria-label="Quay lại"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <h2 id="settingsTitle">Cài đặt đồng bộ Google Sheet</h2>
+    </div>
+    <form onsubmit="return false">
+      <div class="field">
+        <label for="url">URL Apps Script (Web App)</label>
+        <input id="url" placeholder="https://script.google.com/macros/s/…/exec">
+        <div class="help">Lấy sau khi Deploy script trong Google Sheet của bạn. Xem hướng dẫn trong README.</div>
+      </div>
+      <div class="field">
+        <label for="secret">Mã bí mật</label>
+        <input id="secret" type="password" placeholder="Giống mã đã đặt trong script">
+        <div class="help">Script sẽ từ chối mọi yêu cầu không có đúng mã này.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn primary" id="saveSettings">Lưu</button>
+        <button class="btn" id="testConn">Kiểm tra kết nối</button>
+        <span class="result" id="testResult" aria-live="polite"></span>
+      </div>
+      <div class="foot">Chưa cấu hình thì note vẫn lưu trong trình duyệt bình thường, chỉ không đồng bộ.</div>
+    </form>
+  </div>
+  <div class="sr-only" id="live" aria-live="polite"></div>
+</div>
+
+<script>
+  // Throwaway mockup: in-memory data only.
+  const MAX_NOTES = 3;
+  const colors = [
+    ['--c-blue', 'Xanh dương'], ['--c-red', 'Đỏ'], ['--c-green', 'Xanh lá'],
+    ['--c-orange', 'Cam'], ['--c-purple', 'Tím'], ['--c-gray', 'Xám'],
+  ];
+  let uid = 100;
+  const folders = [
+    { id: 1, name: 'Folder 1', notes: [
+      '<b><span style="color:#1a73e8">ACTIVE:</span></b><br>Prepaid user:<br>820000000001 - 60100000001 - 78900001<br>MUP98<br>810000000002 / 60100000002 - MUP98<br>810000000003 / 60100000003 - MP139',
+      'Note 2:<br><br>aw_hotlink_billrebate<br><br>2600000A/010300000001<br><br>A2C SO1:<br><a href="#">http://localhost:3000/app/exclusive-offer/so1?</a>'
+    ]},
+    { id: 2, name: 'Folder 2', notes: [
+      '<b><span style="color:#188038">Danh sách test dài</span></b><br>' +
+        Array.from({ length: 40 }, (_, i) => `${i + 1}. 8100000${String(i).padStart(5, '0')} - 6010000${String(i).padStart(4, '0')} - MUP${90 + (i % 10)}`).join('<br>'),
+      '', ''
+    ]},
+    { id: 3, name: 'Test data', notes: ['<b>Postpaid</b><br>810000000009 - P79'] },
+  ];
+  let active = 1, renaming = null, lastBody = null, savedRange = null;
+  const $ = id => document.getElementById(id);
+  const cur = () => folders.find(f => f.id === active);
+  const announce = msg => { $('live').textContent = msg; };
+  const icon = d => `<svg viewBox="0 0 24 24">${d}</svg>`;
+
+  function renderTabs() {
+    const tabs = $('tabs'); tabs.innerHTML = '';
+    for (const f of folders) {
+      const wrap = document.createElement('div');
+      wrap.className = 'tab' + (f.id === active ? ' active' : '');
+      if (renaming === f.id) {
+        const inp = document.createElement('input'); inp.value = f.name; inp.maxLength = 30;
+        inp.setAttribute('aria-label', 'Tên thư mục');
+        let closed = false;
+        const done = save => {
+          if (closed) return; closed = true;
+          if (save) f.name = inp.value.trim() || f.name;
+          renaming = null; renderTabs(); if (save) fakeSync();
+          tabs.querySelector('.active .name')?.focus();
+        };
+        inp.onkeydown = e => { if (e.key === 'Enter') done(true); if (e.key === 'Escape') done(false); };
+        inp.onblur = () => done(true);
+        wrap.appendChild(inp); tabs.appendChild(wrap); setTimeout(() => inp.select()); continue;
+      }
+      const name = document.createElement('button'); name.className = 'name'; name.textContent = f.name;
+      name.setAttribute('role', 'tab'); name.setAttribute('aria-selected', f.id === active);
+      name.tabIndex = f.id === active ? 0 : -1;
+      name.title = f.id === active ? 'Nhấp đúp để đổi tên' : f.name;
+      name.onclick = () => selectFolder(f.id);
+      name.ondblclick = () => { renaming = f.id; renderTabs(); };
+      name.onkeydown = e => {
+        const i = folders.indexOf(f);
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          const next = folders[(i + (e.key === 'ArrowRight' ? 1 : -1) + folders.length) % folders.length];
+          selectFolder(next.id); tabs.querySelector('.active .name').focus();
+        }
+        if (e.key === 'F2') { renaming = f.id; renderTabs(); }
+      };
+      wrap.appendChild(name);
+      const rn = document.createElement('button'); rn.className = 'rename';
+      rn.title = 'Đổi tên (F2)'; rn.setAttribute('aria-label', 'Đổi tên thư mục ' + f.name);
+      rn.innerHTML = icon('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>');
+      rn.onclick = () => { renaming = f.id; renderTabs(); };
+      wrap.appendChild(rn);
+      tabs.appendChild(wrap);
+    }
+    tabs.querySelector('.active')?.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+    $('delFolder').disabled = folders.length === 1;
+    $('delFolder').title = folders.length === 1 ? 'Cần giữ ít nhất 1 thư mục' : 'Xóa thư mục đang chọn';
+  }
+
+  function selectFolder(id) {
+    active = id; lastBody = null; savedRange = null;
+    $('folderConfirm').classList.remove('show'); render();
+  }
+
+  function renderGrid() {
+    const grid = $('grid'); grid.innerHTML = '';
+    cur().notes.forEach((html, i) => {
+      const n = document.createElement('div'); n.className = 'note';
+      const head = document.createElement('div'); head.className = 'note-head';
+      head.innerHTML = `<span class="label">Note ${i + 1}</span><span class="copied" hidden>Đã copy</span>`;
+      const copy = document.createElement('button'); copy.className = 'act';
+      copy.title = 'Copy toàn bộ note'; copy.setAttribute('aria-label', `Copy note ${i + 1}`);
+      copy.innerHTML = icon('<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>');
+      const del = document.createElement('button'); del.className = 'act del';
+      del.title = 'Xóa note'; del.setAttribute('aria-label', `Xóa note ${i + 1}`);
+      del.innerHTML = icon('<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>');
+      head.append(copy, del);
+
+      const body = document.createElement('div'); body.className = 'body';
+      body.contentEditable = 'true'; body.innerHTML = html;
+      body.setAttribute('role', 'textbox'); body.setAttribute('aria-multiline', 'true'); body.setAttribute('aria-label', `Nội dung note ${i + 1}`);
+      body.oninput = () => { cur().notes[i] = body.innerHTML; fakeSync(); };
+      body.onfocus = () => { lastBody = body; setToolbar(true); };
+      body.onkeydown = e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openLink(); } };
+
+      const ov = document.createElement('div'); ov.className = 'overlay'; ov.setAttribute('role', 'alertdialog');
+      ov.innerHTML = '<div>Xóa note này?</div><div style="display:flex;gap:8px"><button class="btn">Hủy</button><button class="btn danger">Xóa</button></div>';
+      const [cancel, ok] = ov.querySelectorAll('button');
+      const closeOv = () => { ov.classList.remove('show'); del.focus(); };
+      del.onclick = () => { ov.classList.add('show'); cancel.focus(); };
+      cancel.onclick = closeOv;
+      ov.onkeydown = e => { if (e.key === 'Escape') closeOv(); };
+      ok.onclick = () => { cur().notes.splice(i, 1); lastBody = null; renderGrid(); setToolbar(false); fakeSync(); announce('Đã xóa note'); };
+      copy.onclick = async () => {
+        try { await navigator.clipboard.write([new ClipboardItem({
+          'text/html': new Blob([body.innerHTML], { type: 'text/html' }),
+          'text/plain': new Blob([body.innerText], { type: 'text/plain' }) })]); } catch {}
+        const c = head.querySelector('.copied'); c.hidden = false; announce('Đã copy note');
+        setTimeout(() => c.hidden = true, 1200);
+      };
+
+      n.append(head, body, ov); grid.appendChild(n);
+    });
+    const count = cur().notes.length;
+    grid.style.setProperty('--cols', Math.max(count, 1));
+    if (!count) grid.innerHTML = '<div class="empty-folder"><b>Thư mục trống</b><span>Bấm "Thêm note" để bắt đầu ghi chú.</span></div>';
+    $('addNote').disabled = count >= MAX_NOTES;
+    $('addNoteText').textContent = count >= MAX_NOTES ? `Đủ ${MAX_NOTES}/${MAX_NOTES} note` : `Thêm note (${count}/${MAX_NOTES})`;
+    $('addNote').title = count >= MAX_NOTES ? `Mỗi thư mục tối đa ${MAX_NOTES} note` : '';
+  }
+
+  $('addNote').onclick = () => {
+    if (cur().notes.length >= MAX_NOTES) return;
+    cur().notes.push(''); renderGrid(); fakeSync();
+    $('grid').querySelectorAll('.body')[cur().notes.length - 1].focus();
+  };
+
+  // Toolbar stays usable after focus leaves the note: we remember the last note + selection.
+  function setToolbar(on) {
+    document.querySelectorAll('.toolbar .tb').forEach(b => b.disabled = !on);
+    $('tbHint').textContent = on ? '' : 'Chọn một note để định dạng';
+  }
+  document.addEventListener('selectionchange', () => {
+    const sel = getSelection();
+    if (lastBody && sel.rangeCount && lastBody.contains(sel.anchorNode)) {
+      savedRange = sel.getRangeAt(0).cloneRange();
+      for (const cmd of ['bold', 'italic', 'underline'])
+        document.querySelector(`.tb[data-cmd="${cmd}"]`).setAttribute('aria-pressed', document.queryCommandState(cmd));
+    }
+  });
+  function restoreSelection() {
+    if (!lastBody) return false;
+    lastBody.focus();
+    if (savedRange) { const s = getSelection(); s.removeAllRanges(); s.addRange(savedRange); }
+    return true;
+  }
+
+  const sw = $('swatches');
+  for (const [c, label] of colors) {
+    const b = document.createElement('button'); b.className = 'tb'; b.dataset.cmd = 'color'; b.dataset.color = c;
+    b.title = 'Màu chữ: ' + label; b.setAttribute('aria-label', 'Màu chữ ' + label);
+    b.innerHTML = `<span class="swatch" style="background:var(${c})"></span>`;
+    sw.appendChild(b);
+  }
+  // mousedown keeps the selection inside the note; click covers keyboard activation.
+  $('toolbar').addEventListener('mousedown', e => { if (e.target.closest('.tb')) e.preventDefault(); });
+  $('toolbar').addEventListener('click', e => {
+    const b = e.target.closest('.tb'); if (!b || b.disabled || !restoreSelection()) return;
+    const cmd = b.dataset.cmd;
+    if (cmd === 'link') return openLink();
+    if (cmd === 'color') document.execCommand('foreColor', false, getComputedStyle(document.documentElement).getPropertyValue(b.dataset.color).trim());
+    else document.execCommand(cmd);
+    lastBody.dispatchEvent(new Event('input'));
+  });
+
+  function openLink() {
+    const sel = String(savedRange || '');
+    $('linkInput').value = /^https?:\/\//.test(sel) ? sel : '';
+    $('linkPop').classList.add('show'); $('linkInput').focus();
+  }
+  function closeLink() { $('linkPop').classList.remove('show'); restoreSelection(); }
+  $('linkCancel').onclick = closeLink;
+  $('linkOk').onclick = () => {
+    let url = $('linkInput').value.trim(); if (!url) return closeLink();
+    if (!/^[a-z]+:\/\//i.test(url)) url = 'https://' + url;
+    $('linkPop').classList.remove('show'); restoreSelection();
+    if (savedRange && !savedRange.collapsed) document.execCommand('createLink', false, url);
+    else document.execCommand('insertHTML', false, `<a href="${url}">${url}</a>&nbsp;`);
+    lastBody.dispatchEvent(new Event('input'));
+  };
+  $('linkInput').onkeydown = e => { if (e.key === 'Enter') $('linkOk').click(); if (e.key === 'Escape') closeLink(); };
+
+  // Folders
+  $('addFolder').onclick = () => {
+    const f = { id: ++uid, name: 'Folder ' + (folders.length + 1), notes: ['', ''] };
+    folders.push(f); active = f.id; renaming = f.id; render(); fakeSync();
+  };
+  $('delFolder').onclick = () => {
+    if (folders.length === 1) return;
+    $('folderConfirmText').textContent = `Xóa thư mục "${cur().name}" và ${cur().notes.length} note bên trong? Không thể hoàn tác.`;
+    $('folderConfirm').classList.add('show'); $('folderCancel').focus();
+  };
+  const closeFolderConfirm = () => { $('folderConfirm').classList.remove('show'); $('delFolder').focus(); };
+  $('folderCancel').onclick = closeFolderConfirm;
+  $('folderConfirm').onkeydown = e => { if (e.key === 'Escape') closeFolderConfirm(); };
+  $('folderOk').onclick = () => {
+    const i = folders.indexOf(cur()); const name = cur().name; folders.splice(i, 1);
+    active = folders[Math.max(0, i - 1)].id; $('folderConfirm').classList.remove('show');
+    render(); fakeSync(); announce(`Đã xóa thư mục ${name}`);
+  };
+
+  function render() { renderTabs(); renderGrid(); setToolbar(false); }
+
+  // Fake sync indicator
+  let t;
+  function fakeSync() {
+    const s = $('sync'); s.dataset.state = 'syncing'; $('syncText').textContent = 'Đang đồng bộ…';
+    clearTimeout(t); t = setTimeout(() => {
+      s.dataset.state = 'ok'; $('syncText').textContent = 'Đã đồng bộ';
+      s.title = 'Đã đồng bộ với Google Sheet lúc ' + new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    }, 1500);
+  }
+
+  // Settings
+  const closeSettings = () => { $('settings').classList.remove('show'); $('openSettings').focus(); };
+  $('openSettings').onclick = () => { $('settings').classList.add('show'); $('url').focus(); };
+  $('closeSettings').onclick = closeSettings;
+  $('settings').onkeydown = e => { if (e.key === 'Escape') closeSettings(); };
+  $('saveSettings').onclick = () => { const r = $('testResult'); r.className = 'result ok'; r.textContent = '✓ Đã lưu'; };
+  $('testConn').onclick = () => {
+    const r = $('testResult'); r.className = 'result'; r.textContent = 'Đang kiểm tra…';
+    setTimeout(() => { r.className = 'result ok'; r.textContent = '✓ Kết nối được: 3 thư mục, 6 note'; }, 800);
+  };
+
+  render();
+</script>
+</body>
+</html>
