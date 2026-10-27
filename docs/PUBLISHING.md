@@ -35,9 +35,9 @@ Reload the extension, open the popup → gear → **Sign in with Google**. Expec
 ## 4. Chrome Web Store
 
 1. Register at the [Developer Dashboard](https://chrome.google.com/webstore/devconsole) (one-time US$5 fee).
-2. Remove the `"key"` field from `manifest.json` for the upload copy, then build the zip from the repo root:
+2. Build the upload zip (the script drops the manifest `"key"` field automatically):
    ```sh
-   zip -r sticky-notes-sync.zip manifest.json src assets LICENSE -x '*.DS_Store'
+   npm run build   # -> dist/sticky-notes-sync-<version>.zip
    ```
 3. Upload. The store assigns the final ID (`<store-id>`). Add `https://<store-id>.chromiumapp.org/` to the OAuth client's redirect URIs.
 4. Listing:

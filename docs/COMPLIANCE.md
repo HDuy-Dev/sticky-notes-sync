@@ -52,5 +52,5 @@ Remote code: none. All JavaScript ships in the package.
 
 - [ ] `npm test` passes.
 - [ ] `grep -r "YOUR_CLIENT_ID\|CONTACT_EMAIL" src PRIVACY.md docs/privacy.html` returns nothing.
-- [ ] `"key"` removed from the uploaded `manifest.json`.
+- [ ] Upload zip built with `npm run build` (drops the manifest `"key"`).
 - [ ] Privacy policy URL is public and matches the OAuth consent screen.
