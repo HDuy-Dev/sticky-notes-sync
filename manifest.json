@@ -5,17 +5,33 @@
   "description": "Quick formatted notes in folders, synced to a Google Sheet in your own Drive.",
   "action": {
     "default_title": "Sticky Notes Sync",
-    "default_popup": "src/popup/popup.html"
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png",
+      "48": "assets/icons/icon-48.png"
+    }
   },
   "background": {
     "service_worker": "src/background.js",
     "type": "module"
   },
-  "permissions": ["storage", "alarms", "identity", "clipboardWrite"],
+  "permissions": [
+    "storage",
+    "alarms",
+    "identity",
+    "clipboardWrite"
+  ],
   "host_permissions": [
     "https://www.googleapis.com/*",
     "https://sheets.googleapis.com/*",
     "https://openidconnect.googleapis.com/*",
     "https://oauth2.googleapis.com/*"
-  ]
+  ],
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  }
 }
