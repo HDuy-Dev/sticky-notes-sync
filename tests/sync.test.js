@@ -267,3 +267,16 @@ test('signOut keeps or removes notes', async () => {
   assert.deepEqual(remove.state, defaultState());
   assert.equal(liveFolders(remove.state).length, 1);
 });
+
+test('pending sign-in is reported until answered', async () => {
+  const h = harness({
+    auth: fakeAuth({ account: null, signInEmail: 'b@x.com' }),
+    state: edit(defaultState(), 'default-n1', 'private', 5),
+    local: { lastEmail: 'a@x.com' },
+  });
+  assert.equal(h.syncer.pendingSignIn(), null);
+  await h.syncer.signIn();
+  assert.deepEqual(h.syncer.pendingSignIn(), { email: 'b@x.com', previousEmail: 'a@x.com' });
+  await h.syncer.cancelSignIn();
+  assert.equal(h.syncer.pendingSignIn(), null);
+});

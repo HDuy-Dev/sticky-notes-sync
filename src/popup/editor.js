@@ -4,8 +4,8 @@
 import { sanitizeHtml, htmlToText } from '../lib/sanitize.js';
 
 const COLORS = [
-  ['#1a73e8', 'Xanh dương'], ['#d93025', 'Đỏ'], ['#188038', 'Xanh lá'],
-  ['#e8710a', 'Cam'], ['#8430ce', 'Tím'], ['#5f6368', 'Xám'],
+  ['#1a73e8', 'Blue'], ['#d93025', 'Red'], ['#188038', 'Green'],
+  ['#e8710a', 'Orange'], ['#8430ce', 'Purple'], ['#5f6368', 'Gray'],
 ];
 const STATE_COMMANDS = ['bold', 'italic', 'underline'];
 
@@ -29,15 +29,15 @@ export function initEditor({ toolbarEl, onNoteInput }) {
     b.className = 'tb';
     b.dataset.cmd = 'color';
     b.dataset.color = color;
-    b.title = `Màu chữ: ${name}`;
-    b.setAttribute('aria-label', `Màu chữ ${name}`);
+    b.title = `Text color: ${name}`;
+    b.setAttribute('aria-label', `Text color ${name}`);
     b.innerHTML = `<span class="swatch" style="background:${color}"></span>`;
     q('#swatches').append(b);
   }
 
   function setEnabled(on) {
     toolbarEl.querySelectorAll('.tb').forEach(b => { b.disabled = !on; });
-    q('#tbHint').textContent = on ? '' : 'Chọn một note để định dạng';
+    q('#tbHint').textContent = on ? '' : 'Select a note to format';
   }
 
   function updatePressed() {

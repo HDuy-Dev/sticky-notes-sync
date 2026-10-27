@@ -82,7 +82,7 @@ async function handle(msg) {
         readState(), getStatus(), auth.getAccount(), chrome.storage.local.get('sheet'),
       ]);
       const sheetUrl = account && sheet?.email === account.email ? store.url(sheet.spreadsheetId) : null;
-      return { state, status, account, sheetUrl };
+      return { state, status, account, sheetUrl, pendingSignIn: syncer.pendingSignIn() };
     }
     case 'mutate': {
       let error = null;

@@ -28,7 +28,7 @@ function describe(err) {
 export function createSyncer({ readState, updateState, setStatus, auth, store, local, now }) {
   let running = null;
   let again = false;
-  let pendingEmail = null;
+  let pending = null; // { email, previousEmail } awaiting the user's answer
 
   const getLocal = async key => (await local.get(key))[key];
 
@@ -101,7 +101,7 @@ export function createSyncer({ readState, updateState, setStatus, auth, store, l
     const sheet = await getLocal('sheet');
     if (sheet && sheet.email !== email) await local.remove('sheet');
     await local.set({ account: { email }, lastEmail: email });
-    pendingEmail = null;
+    pending = null;
     syncOnce();
     return { ok: true, email };
   }
@@ -116,19 +116,19 @@ export function createSyncer({ readState, updateState, setStatus, auth, store, l
     }
     const previousEmail = await getLocal('lastEmail');
     if (previousEmail && previousEmail !== email && hasLocalNotes(await readState())) {
-      pendingEmail = email;
+      pending = { email, previousEmail };
       return { ok: false, needsConfirm: true, email, previousEmail };
     }
     return commit(email);
   }
 
   async function confirmSignIn() {
-    if (!pendingEmail) return { ok: false, error: 'Nothing to confirm' };
-    return commit(pendingEmail);
+    if (!pending) return { ok: false, error: 'Nothing to confirm' };
+    return commit(pending.email);
   }
 
   async function cancelSignIn() {
-    pendingEmail = null;
+    pending = null;
     await auth.signOut();
     return { ok: true };
   }
@@ -141,5 +141,9 @@ export function createSyncer({ readState, updateState, setStatus, auth, store, l
     return { ok: true };
   }
 
-  return { syncOnce, signIn, confirmSignIn, cancelSignIn, signOut };
+  // The popup may close while Google's sign-in window has focus, so it asks
+  // again on reopen.
+  const pendingSignIn = () => pending;
+
+  return { syncOnce, signIn, confirmSignIn, cancelSignIn, signOut, pendingSignIn };
 }
