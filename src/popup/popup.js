@@ -12,6 +12,7 @@ const ICON_TRASH = '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>';
 
 let state = null;
 let status = { status: 'off', tooLong: [] };
+let config = null;
 let activeId = null;
 let renamingId = null;
 const noteEls = new Map(); // note id -> element, reused across renders
@@ -326,6 +327,81 @@ $('addNote').addEventListener('click', async () => {
   await mutate({ type: 'addNote', id, folderId: activeId });
 });
 
+// ---- Sync status + settings ---------------------------------------------
+
+const STATUS_TEXT = { off: 'Chưa đồng bộ', syncing: 'Đang đồng bộ…', idle: 'Đã đồng bộ', error: 'Lỗi đồng bộ' };
+
+function formatTime(ms) {
+  return new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+}
+
+function renderStatus() {
+  const chip = $('sync');
+  const s = status.status in STATUS_TEXT ? status.status : 'off';
+  chip.dataset.state = s;
+  $('syncText').textContent = STATUS_TEXT[s];
+  chip.title = {
+    off: 'Chưa cấu hình Google Sheet',
+    syncing: 'Đang đồng bộ với Google Sheet',
+    idle: status.lastSyncAt ? `Đã đồng bộ với Google Sheet lúc ${formatTime(status.lastSyncAt)}` : 'Đã đồng bộ',
+    error: `${status.error || 'Lỗi không rõ'} — bấm để thử lại`,
+  }[s];
+}
+
+$('sync').addEventListener('click', () => {
+  if (status.status === 'error') send({ type: 'syncNow' });
+});
+
+function showResult(ok, text) {
+  const r = $('testResult');
+  r.className = 'result ' + (ok ? 'ok' : 'err');
+  r.textContent = text;
+}
+
+function formConfig() {
+  return { url: $('url').value.trim(), secret: $('secret').value };
+}
+
+function openSettings() {
+  $('url').value = config?.url || '';
+  $('secret').value = config?.secret || '';
+  $('testResult').textContent = '';
+  $('settings').classList.add('show');
+  $('url').focus();
+}
+
+function closeSettings() {
+  $('settings').classList.remove('show');
+  $('openSettings').focus();
+}
+
+$('openSettings').addEventListener('click', openSettings);
+$('closeSettings').addEventListener('click', closeSettings);
+$('settings').addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSettings();
+});
+
+$('settingsForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const next = formConfig();
+  if (next.url && !/^https:\/\/script\.google(usercontent)?\.com\//.test(next.url)) {
+    showResult(false, '✗ URL phải là link Apps Script (https://script.google.com/…/exec)');
+    return;
+  }
+  await send({ type: 'saveConfig', config: next });
+  config = next;
+  showResult(true, '✓ Đã lưu');
+});
+
+$('testConn').addEventListener('click', async () => {
+  const r = $('testResult');
+  r.className = 'result';
+  r.textContent = 'Đang kiểm tra…';
+  const res = await send({ type: 'testConnection', config: formConfig() });
+  if (res?.ok) showResult(true, `✓ Kết nối được: ${res.folders} thư mục, ${res.notes} note`);
+  else showResult(false, `✗ ${res?.error || 'Lỗi không rõ'}`);
+});
+
 // ---- Render -------------------------------------------------------------
 
 function render() {
@@ -334,6 +410,7 @@ function render() {
   const renameInput = $('tabs').querySelector('input');
   if (!renameInput || document.activeElement !== renameInput) renderTabs();
   renderGrid();
+  renderStatus();
   if (focusNoteId && noteEls.has(focusNoteId)) {
     noteEls.get(focusNoteId).querySelector('.body').focus();
     focusNoteId = null;
@@ -342,6 +419,7 @@ function render() {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
+  if (changes.config) config = changes.config.newValue || null;
   if (changes.syncStatus) status = changes.syncStatus.newValue || status;
   if (changes.state?.newValue) state = changes.state.newValue;
   if (state && (changes.state || changes.syncStatus)) render();
@@ -351,6 +429,7 @@ async function init() {
   const res = await send({ type: 'getState' });
   state = res.state;
   status = res.status;
+  config = res.config;
   activeId = loadActive();
   render();
   send({ type: 'syncNow' });

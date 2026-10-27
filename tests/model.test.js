@@ -81,3 +81,9 @@ test('applyMutation does not mutate input', () => {
   applyMutation(s, { type: 'addFolder', id: 'f', name: 'F', noteIds: ['a', 'b'] }, 1);
   assert.deepEqual(s, before);
 });
+
+test('editing a note in the pristine default folder also pushes the folder', () => {
+  const s = applyMutation(defaultState(), { type: 'editNote', id: 'default-n1', html: 'a', text: 'a' }, 7).state;
+  assert.ok(s.dirty[DEFAULT_FOLDER_ID]);
+  assert.equal(s.folders[DEFAULT_FOLDER_ID].updatedAt, 0);
+});
