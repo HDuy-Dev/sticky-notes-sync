@@ -362,10 +362,32 @@ function formConfig() {
   return { url: $('url').value.trim(), secret: $('secret').value };
 }
 
+// Unsaved settings are kept as a draft so closing the popup loses nothing.
+let draft = null;
+const sameConfig = (a, b) => (a?.url || '') === (b?.url || '') && (a?.secret || '') === (b?.secret || '');
+const hasDraft = () => Boolean(draft) && !sameConfig(draft, config);
+
+function saveDraft() {
+  draft = formConfig();
+  if (hasDraft()) chrome.storage.local.set({ configDraft: draft });
+  else chrome.storage.local.remove('configDraft');
+}
+
+function clearDraft() {
+  draft = null;
+  chrome.storage.local.remove('configDraft');
+}
+
+$('url').addEventListener('input', saveDraft);
+$('secret').addEventListener('input', saveDraft);
+
 function openSettings() {
-  $('url').value = config?.url || '';
-  $('secret').value = config?.secret || '';
-  $('testResult').textContent = '';
+  const values = hasDraft() ? draft : config;
+  $('url').value = values?.url || '';
+  $('secret').value = values?.secret || '';
+  const r = $('testResult');
+  r.className = 'result';
+  r.textContent = hasDraft() ? 'Bản nháp chưa lưu — bấm Lưu để áp dụng' : '';
   $('settings').classList.add('show');
   $('url').focus();
 }
@@ -390,6 +412,7 @@ $('settingsForm').addEventListener('submit', async e => {
   }
   await send({ type: 'saveConfig', config: next });
   config = next;
+  clearDraft();
   showResult(true, '✓ Đã lưu');
 });
 
@@ -430,8 +453,11 @@ async function init() {
   state = res.state;
   status = res.status;
   config = res.config;
+  ({ configDraft: draft = null } = await chrome.storage.local.get('configDraft'));
   activeId = loadActive();
   render();
+  // Bring back unfinished settings right where the user left them.
+  if (hasDraft()) openSettings();
   send({ type: 'syncNow' });
 }
 
