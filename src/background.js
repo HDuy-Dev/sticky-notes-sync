@@ -3,6 +3,7 @@
 
 import { applyMutation, defaultState } from './lib/model.js';
 import { createSyncer } from './lib/sync.js';
+import { hasPushable } from './lib/merge.js';
 
 const PUSH_DELAY_MS = 2000;
 const ALARM = 'sync';
@@ -107,6 +108,5 @@ chrome.runtime.onStartup.addListener(ensureAlarm);
 
 chrome.alarms.onAlarm.addListener(async alarm => {
   if (alarm.name !== ALARM) return;
-  const state = await readState();
-  if (Object.keys(state.dirty).length) await syncer.syncOnce();
+  if (hasPushable(await readState())) await syncer.syncOnce();
 });

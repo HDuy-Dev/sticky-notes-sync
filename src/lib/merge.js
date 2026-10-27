@@ -50,3 +50,10 @@ export function mergeRemote(state, remote, sent) {
   }
   return s;
 }
+
+// True when a sync round would actually send something. A too-long note
+// stays dirty but cannot be sent, so it must not keep the retry alarm busy.
+export function hasPushable(state) {
+  const { folders, notes } = collectChanges(state);
+  return folders.length + notes.length > 0;
+}

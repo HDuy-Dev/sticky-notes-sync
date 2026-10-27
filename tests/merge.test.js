@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { defaultState, applyMutation, liveFolders, DEFAULT_FOLDER_ID } from '../src/lib/model.js';
-import { collectChanges, mergeRemote } from '../src/lib/merge.js';
+import { collectChanges, mergeRemote, hasPushable } from '../src/lib/merge.js';
 
 const edit = (s, id, html, now) => applyMutation(s, { type: 'editNote', id, html, text: html }, now).state;
 const note = (id, html, updatedAt, extra = {}) => ({
@@ -82,4 +82,14 @@ test('mergeRemote does not mutate input', () => {
   const before = structuredClone(s);
   mergeRemote(s, { folders: [], notes: [note('default-n1', 'r', 9)] }, { 'default-n1': 5 });
   assert.deepEqual(s, before);
+});
+
+test('hasPushable ignores records that cannot be sent', () => {
+  assert.equal(hasPushable(defaultState()), false);
+  assert.equal(hasPushable(edit(defaultState(), 'default-n1', 'a', 5)), true);
+  const long = edit(defaultState(), 'default-n1', 'x'.repeat(45001), 5);
+  // Only the too-long note (and its folder, already synced) remain dirty.
+  const synced = mergeRemote(long, { folders: [], notes: [] }, collectChanges(long).sent);
+  assert.deepEqual(Object.keys(synced.dirty), ['default-n1']);
+  assert.equal(hasPushable(synced), false);
 });
