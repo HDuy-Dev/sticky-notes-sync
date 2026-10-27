@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Sticky Notes Sync",
-  "version": "0.1.0",
-  "description": "Quick formatted notes in folders, synced to your own Google Sheet.",
+  "version": "1.0.0",
+  "description": "Quick formatted notes in folders, synced to a Google Sheet in your own Drive.",
   "action": {
     "default_title": "Sticky Notes Sync",
     "default_popup": "src/popup/popup.html"
@@ -11,9 +11,11 @@
     "service_worker": "src/background.js",
     "type": "module"
   },
-  "permissions": ["storage", "alarms", "clipboardWrite"],
+  "permissions": ["storage", "alarms", "identity", "clipboardWrite"],
   "host_permissions": [
-    "https://script.google.com/*",
-    "https://script.googleusercontent.com/*"
+    "https://www.googleapis.com/*",
+    "https://sheets.googleapis.com/*",
+    "https://openidconnect.googleapis.com/*",
+    "https://oauth2.googleapis.com/*"
   ]
 }
