@@ -11,10 +11,9 @@ const note = (id, html, updatedAt, extra = {}) => ({
 test('collectChanges returns only dirty records', () => {
   const s = edit(defaultState(), 'default-n1', 'a', 5);
   const c = collectChanges(s);
-  // The pristine default folder travels with its first edited note.
-  assert.deepEqual(c.folders.map(f => f.id), [DEFAULT_FOLDER_ID]);
+  assert.deepEqual(c.folders, []);
   assert.deepEqual(c.notes.map(n => n.id), ['default-n1']);
-  assert.deepEqual(c.sent, { 'default-n1': 5, [DEFAULT_FOLDER_ID]: 0 });
+  assert.deepEqual(c.sent, { 'default-n1': 5 });
   assert.deepEqual(c.tooLong, []);
 });
 
@@ -22,7 +21,7 @@ test('collectChanges skips too-long notes', () => {
   const s = edit(defaultState(), 'default-n1', 'x'.repeat(45001), 5);
   const c = collectChanges(s);
   assert.deepEqual(c.notes, []);
-  assert.deepEqual(c.sent, { [DEFAULT_FOLDER_ID]: 0 });
+  assert.deepEqual(c.sent, {});
   assert.deepEqual(c.tooLong, ['default-n1']);
   assert.ok(s.dirty['default-n1']);
 });
@@ -88,7 +87,6 @@ test('hasPushable ignores records that cannot be sent', () => {
   assert.equal(hasPushable(defaultState()), false);
   assert.equal(hasPushable(edit(defaultState(), 'default-n1', 'a', 5)), true);
   const long = edit(defaultState(), 'default-n1', 'x'.repeat(45001), 5);
-  // Only the too-long note (and its folder, already synced) remain dirty.
   const synced = mergeRemote(long, { folders: [], notes: [] }, collectChanges(long).sent);
   assert.deepEqual(Object.keys(synced.dirty), ['default-n1']);
   assert.equal(hasPushable(synced), false);

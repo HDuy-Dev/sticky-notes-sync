@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  MAX_NOTES, DEFAULT_FOLDER_ID, defaultState, applyMutation, liveFolders, liveNotes,
+  MAX_NOTES, DEFAULT_FOLDER_ID, defaultState, applyMutation, liveFolders, liveNotes, markAllDirty,
 } from '../src/lib/model.js';
 
 function withFolder(state, id = 'f2', noteIds = ['n1', 'n2']) {
@@ -82,8 +82,17 @@ test('applyMutation does not mutate input', () => {
   assert.deepEqual(s, before);
 });
 
-test('editing a note in the pristine default folder also pushes the folder', () => {
+test('editing a note does not dirty its folder', () => {
+  // A dirty folder rewrites all its note rows; the first sync into a sheet
+  // pushes the default folder via markAllDirty instead.
   const s = applyMutation(defaultState(), { type: 'editNote', id: 'default-n1', html: 'a', text: 'a' }, 7).state;
-  assert.ok(s.dirty[DEFAULT_FOLDER_ID]);
-  assert.equal(s.folders[DEFAULT_FOLDER_ID].updatedAt, 0);
+  assert.deepEqual(Object.keys(s.dirty), ['default-n1']);
+});
+
+test('markAllDirty marks tombstones too', () => {
+  let s = applyMutation(defaultState(), { type: 'deleteNote', id: 'default-n2' }, 3).state;
+  s = { ...s, dirty: {} };
+  const all = markAllDirty(s);
+  assert.deepEqual(Object.keys(all.dirty).sort(), [DEFAULT_FOLDER_ID, 'default-n1', 'default-n2'].sort());
+  assert.deepEqual(s.dirty, {});
 });

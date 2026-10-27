@@ -41,6 +41,13 @@ export function liveNotes(state, folderId) {
     .sort((a, b) => a.order - b.order);
 }
 
+// Used when syncing into a new or different spreadsheet: everything goes up.
+export function markAllDirty(state) {
+  const dirty = {};
+  for (const id of [...Object.keys(state.folders), ...Object.keys(state.notes)]) dirty[id] = true;
+  return { ...state, dirty };
+}
+
 function nextOrder(records) {
   return records.reduce((max, r) => Math.max(max, r.order), -1) + 1;
 }
@@ -59,10 +66,6 @@ export function applyMutation(state, mutation, now) {
   const touchNote = (id, patch) => {
     s.notes[id] = { ...s.notes[id], ...patch, updatedAt: now };
     s.dirty[id] = true;
-    // A never-synced folder (the default one) must reach the Sheet with its
-    // first note; updatedAt stays 0 so any real edit elsewhere still wins.
-    const folder = s.folders[s.notes[id].folderId];
-    if (folder && folder.updatedAt === 0) s.dirty[folder.id] = true;
   };
   const liveFolder = id => s.folders[id] && !s.folders[id].deleted;
   const liveNote = id => s.notes[id] && !s.notes[id].deleted;
