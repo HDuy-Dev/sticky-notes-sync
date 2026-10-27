@@ -44,6 +44,6 @@ If this policy changes, the new version will be published at the same address wi
 
 ## Contact
 
-Questions: [CONTACT_EMAIL]
+Questions: [lhduy.dev@gmail.com](mailto:lhduy.dev@gmail.com)
 
 _Sticky Notes Sync is not affiliated with Google. Google, Google Drive and Google Sheets are trademarks of Google LLC._
