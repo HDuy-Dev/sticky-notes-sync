@@ -1,5 +1,6 @@
 {
   "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqO9wYZGfxlWMljJFEns7R0/hFXpBLrriBnn577ixeHKLzLq676uJt3EbhtZqf6Q3ub5PVMCVLgKi2MgJiudaJhKEHbU2IK1B75Z5LyaoYsYYvuiX8htAg5DpKQH8tU4u/wgtCEdhY24bMZN+fIZBbvISTFKbu12yqVBGzA/YCqySqosU+evnQOzfCgxPsi01YU5SX1a0gVtxbS6KJqB2ruJYjDe8/q0MaZYbIgQh0Nnst/VztzOpugt1ZyPV/Z16HOyQCLxxiR7WDDCMDj9yAeG7vnhabyxQDXi50fKSYo7rwrGh1lyh270uPPOQCrQWvQztgnZL3VdamZFmAGmBvQIDAQAB",
   "name": "Sticky Notes Sync",
   "version": "1.0.0",
   "description": "Quick formatted notes in folders, synced to a Google Sheet in your own Drive.",
