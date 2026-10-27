@@ -102,7 +102,7 @@ async function handle(msg) {
       await syncer.syncOnce();
       return { ok: true };
     case 'signIn':
-      return syncer.signIn();
+      return syncer.signIn({ forceConsent: Boolean(msg.forceConsent) });
     case 'confirmSignIn':
       return syncer.confirmSignIn();
     case 'cancelSignIn':

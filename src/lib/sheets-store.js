@@ -4,6 +4,7 @@
 
 import { SHEET_NAME, APP_PROPERTY } from '../config.js';
 import { FOLDER_COLUMNS, NOTE_COLUMNS, TABS, parseTab } from './sheet-rows.js';
+import { DriveAccessMissing } from './google-auth.js';
 
 const DRIVE_FILES = 'https://www.googleapis.com/drive/v3/files';
 const SHEETS = 'https://sheets.googleapis.com/v4/spreadsheets';
@@ -14,6 +15,18 @@ export class ApiError extends Error {
   constructor(status) {
     super(`Google API error ${status}`);
     this.status = status;
+  }
+}
+
+// A 403 caused by a token without the Drive scope (the user unticked it on
+// Google's consent screen, or removed it later).
+async function isMissingScope(res) {
+  try {
+    const { error } = await res.json();
+    const reasons = [...(error?.details || []), ...(error?.errors || [])].map(d => d.reason);
+    return reasons.includes('ACCESS_TOKEN_SCOPE_INSUFFICIENT') || reasons.includes('insufficientPermissions');
+  } catch {
+    return false;
   }
 }
 
@@ -31,6 +44,7 @@ export function createSheetsStore({ fetchFn, getToken, onUnauthorized }) {
         continue;
       }
       if (sheet && res.status === 404) throw new SheetMissing('Spreadsheet not found');
+      if (res.status === 403 && (await isMissingScope(res))) throw new DriveAccessMissing('Drive permission not granted');
       if (res.status >= 400) throw new ApiError(res.status);
       return res.json();
     }

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { AuthRequired, buildAuthUrl, parseRedirect, createAuth } from '../src/lib/google-auth.js';
+import { AuthRequired, DriveAccessMissing, buildAuthUrl, parseRedirect, createAuth } from '../src/lib/google-auth.js';
 
 const REDIRECT = 'https://abc.chromiumapp.org/';
 
@@ -109,4 +109,34 @@ test('invalidate drops the cached token', async () => {
   const h = harness({ session: { googleToken: { token: 'C', expiresAt: 9_000_000 } } });
   await h.auth.invalidate();
   assert.equal(await h.auth.getToken({ interactive: false }), 'T1');
+});
+
+const DRIVE = 'https://www.googleapis.com/auth/drive.file';
+
+test('parseRedirect returns granted scopes', () => {
+  const r = parseRedirect(`${REDIRECT}#access_token=abc&expires_in=10&scope=email%20openid%20${encodeURIComponent(DRIVE)}`);
+  assert.deepEqual(r, { token: 'abc', expiresIn: 10, scopes: ['email', 'openid', DRIVE] });
+});
+
+test('buildAuthUrl can force the consent screen', () => {
+  const u = new URL(buildAuthUrl({ clientId: 'cid', redirectUri: REDIRECT, interactive: true, forceConsent: true }));
+  assert.equal(u.searchParams.get('prompt'), 'consent select_account');
+});
+
+test('signIn without the Drive permission throws DriveAccessMissing', async () => {
+  const h = harness({ flow: () => `${REDIRECT}#access_token=T1&expires_in=3600&scope=email%20openid` });
+  await assert.rejects(h.auth.signIn(), DriveAccessMissing);
+  assert.equal(h.session.data.googleToken, undefined);
+  assert.equal(h.fetches.length, 0);
+});
+
+test('signIn with forceConsent asks Google to show the consent screen again', async () => {
+  const h = harness({ flow: () => `${REDIRECT}#access_token=T1&expires_in=3600&scope=email%20${encodeURIComponent(DRIVE)}` });
+  await h.auth.signIn({ forceConsent: true });
+  assert.equal(new URL(h.flows[0].url).searchParams.get('prompt'), 'consent select_account');
+});
+
+test('silent renewal without the Drive permission throws DriveAccessMissing', async () => {
+  const h = harness({ flow: () => `${REDIRECT}#access_token=T2&expires_in=3600&scope=email` });
+  await assert.rejects(h.auth.getToken({ interactive: false }), DriveAccessMissing);
 });

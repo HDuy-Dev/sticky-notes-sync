@@ -331,7 +331,10 @@ $('addNote').addEventListener('click', async () => {
 let account = null;
 let sheetUrl = null;
 
-const STATUS_TEXT = { off: 'Not synced', syncing: 'Syncing…', idle: 'Synced', error: 'Sync error', signin: 'Sign in again' };
+const STATUS_TEXT = {
+  off: 'Not synced', syncing: 'Syncing…', idle: 'Synced', error: 'Sync error',
+  signin: 'Sign in again', drive: 'Allow Drive access',
+};
 
 function formatTime(ms) {
   return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -348,12 +351,14 @@ function renderStatus() {
     idle: status.lastSyncAt ? `Synced at ${formatTime(status.lastSyncAt)}` : 'Synced',
     error: `${status.error || 'Unknown error'} — click to retry`,
     signin: 'Your Google session expired — click to sign in again',
+    drive: 'Sticky Notes Sync needs access to its own files in Google Drive — click to allow',
   }[s];
 }
 
 $('sync').addEventListener('click', () => {
   if (status.status === 'error') send({ type: 'syncNow' });
   else if (status.status === 'signin') signIn();
+  else if (status.status === 'drive') signIn({ forceConsent: true });
   else if (status.status === 'off') openAccount();
 });
 
@@ -364,7 +369,7 @@ function accountMessage(text, kind = '') {
 }
 
 function showOnly(id) {
-  for (const box of ['signOutConfirm', 'switchConfirm']) $(box).hidden = box !== id;
+  for (const box of ['signOutConfirm', 'switchConfirm', 'driveHelp']) $(box).hidden = box !== id;
 }
 
 function renderAccount(pending) {
@@ -403,11 +408,15 @@ function closeAccount() {
   $('openSettings').focus();
 }
 
-async function signIn() {
+async function signIn({ forceConsent = false } = {}) {
   openAccount();
+  showOnly(null);
   accountMessage('Opening Google sign-in…');
-  const res = await send({ type: 'signIn' });
-  if (res?.needsConfirm) {
+  const res = await send({ type: 'signIn', forceConsent });
+  if (res?.needsDrive) {
+    accountMessage('');
+    showOnly('driveHelp');
+  } else if (res?.needsConfirm) {
     accountMessage('');
     renderAccount({ email: res.email });
   } else if (res?.ok) {
@@ -424,7 +433,8 @@ $('closeSettings').addEventListener('click', closeAccount);
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && $('settings').classList.contains('show')) closeAccount();
 });
-$('signIn').addEventListener('click', signIn);
+$('signIn').addEventListener('click', () => signIn());
+$('driveRetry').addEventListener('click', () => signIn({ forceConsent: true }));
 $('openSheet').addEventListener('click', () => {
   if (sheetUrl) chrome.tabs.create({ url: sheetUrl });
 });

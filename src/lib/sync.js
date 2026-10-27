@@ -7,7 +7,7 @@
 import { collectChanges, mergeRemote } from './merge.js';
 import { defaultState, markAllDirty, DEFAULT_FOLDER_ID } from './model.js';
 import { planWrites } from './sheet-rows.js';
-import { AuthRequired } from './google-auth.js';
+import { AuthRequired, DriveAccessMissing } from './google-auth.js';
 import { SheetMissing, ApiError } from './sheets-store.js';
 
 // Anything worth asking about before it lands in another account's sheet.
@@ -19,6 +19,7 @@ export function hasLocalNotes(state) {
 
 function describe(err) {
   if (err instanceof AuthRequired) return { status: 'signin', error: 'Please sign in again' };
+  if (err instanceof DriveAccessMissing) return { status: 'drive', error: 'Allow Google Drive access to sync' };
   if (err instanceof TypeError) return { status: 'error', error: "Can't reach Google" };
   if (err instanceof ApiError) return { status: 'error', error: `Google returned an error (${err.status})` };
   if (err instanceof SheetMissing) return { status: 'error', error: 'Google Sheet not found' };
@@ -106,11 +107,12 @@ export function createSyncer({ readState, updateState, setStatus, auth, store, l
     return { ok: true, email };
   }
 
-  async function signIn() {
+  async function signIn({ forceConsent = false } = {}) {
     let email;
     try {
-      ({ email } = await auth.signIn());
+      ({ email } = await auth.signIn({ forceConsent }));
     } catch (err) {
+      if (err instanceof DriveAccessMissing) return { ok: false, needsDrive: true };
       if (err instanceof AuthRequired) return { ok: false, error: 'Sign-in was cancelled' };
       return { ok: false, error: describe(err).error };
     }

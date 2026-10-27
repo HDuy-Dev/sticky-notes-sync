@@ -68,16 +68,16 @@ svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width:
 .header-actions { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
 .header-actions .divider { width: 1px; height: 20px; background: rgba(255,255,255,.25); margin: 0 4px; }
 .sync {
-  display: inline-flex; align-items: center; gap: 6px; color: #fff; font-size: 12px; border: 0; background: transparent;
+  white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; color: #fff; font-size: 12px; border: 0; background: transparent;
   padding: 0 8px; height: 32px; min-width: 118px; border-radius: 6px; cursor: default;
 }
-.sync[data-state="error"], .sync[data-state="signin"], .sync[data-state="off"] { cursor: pointer; }
-.sync[data-state="error"]:hover, .sync[data-state="signin"]:hover, .sync[data-state="off"]:hover { background: rgba(255,255,255,.14); }
+.sync[data-state="error"], .sync[data-state="signin"], .sync[data-state="drive"], .sync[data-state="off"] { cursor: pointer; }
+.sync[data-state="error"]:hover, .sync[data-state="signin"]:hover, .sync[data-state="drive"]:hover, .sync[data-state="off"]:hover { background: rgba(255,255,255,.14); }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: #7ee08a; }
 .sync[data-state="off"] .dot { background: #aab4c4; }
 .sync[data-state="syncing"] .dot { background: #ffd54f; animation: pulse 1s infinite; }
 .sync[data-state="error"] .dot { background: #ff8a8a; }
-.sync[data-state="signin"] .dot { background: #ffb74d; }
+.sync[data-state="signin"] .dot, .sync[data-state="drive"] .dot { background: #ffb74d; }
 @keyframes pulse { 50% { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 

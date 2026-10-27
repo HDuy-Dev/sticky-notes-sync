@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { defaultState, applyMutation, liveFolders, DEFAULT_FOLDER_ID } from '../src/lib/model.js';
 import { createSyncer } from '../src/lib/sync.js';
-import { AuthRequired } from '../src/lib/google-auth.js';
+import { AuthRequired, DriveAccessMissing } from '../src/lib/google-auth.js';
 import { SheetMissing, ApiError } from '../src/lib/sheets-store.js';
 import { FOLDER_COLUMNS, NOTE_COLUMNS, TABS, parseTab } from '../src/lib/sheet-rows.js';
 
@@ -66,7 +66,8 @@ function fakeAuth({ account = { email: 'a@x.com' }, signInEmail = 'a@x.com' } = 
     signedOut: 0,
     getAccount: async () => auth.account,
     getToken: async () => { if (auth.tokenError) throw auth.tokenError; return 'T'; },
-    signIn: async () => { if (auth.signInError) throw auth.signInError; return { email: signInEmail, token: 'T' }; },
+    signInCalls: [],
+    signIn: async opts => { auth.signInCalls.push(opts); if (auth.signInError) throw auth.signInError; return { email: signInEmail, token: 'T' }; },
     signOut: async () => { auth.signedOut++; auth.account = null; },
     invalidate: async () => {},
   };
@@ -279,4 +280,24 @@ test('pending sign-in is reported until answered', async () => {
   assert.deepEqual(h.syncer.pendingSignIn(), { email: 'b@x.com', previousEmail: 'a@x.com' });
   await h.syncer.cancelSignIn();
   assert.equal(h.syncer.pendingSignIn(), null);
+});
+
+test('missing Drive access during sync sets status drive and keeps dirty', async () => {
+  const h = harness({ state: edit(defaultState(), 'default-n1', 'x', 5) });
+  h.store.readAll = async () => { throw new DriveAccessMissing('no scope'); };
+  await h.syncer.syncOnce();
+  assert.equal(h.status.status, 'drive');
+  assert.equal(h.status.error, 'Allow Google Drive access to sync');
+  assert.ok(h.state.dirty['default-n1']);
+});
+
+test('signIn without Drive access asks to try again', async () => {
+  const h = harness({ auth: fakeAuth({ account: null }) });
+  h.auth.signInError = new DriveAccessMissing('no scope');
+  assert.deepEqual(await h.syncer.signIn(), { ok: false, needsDrive: true });
+  assert.equal(h.local.data.account, undefined);
+
+  h.auth.signInError = null;
+  assert.deepEqual(await h.syncer.signIn({ forceConsent: true }), { ok: true, email: 'a@x.com' });
+  assert.deepEqual(h.auth.signInCalls.at(-1), { forceConsent: true });
 });

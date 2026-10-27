@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSheetsStore, SheetMissing, ApiError } from '../src/lib/sheets-store.js';
+import { DriveAccessMissing } from '../src/lib/google-auth.js';
 import { FOLDER_COLUMNS, NOTE_COLUMNS } from '../src/lib/sheet-rows.js';
 
 const json = (body, status = 200) => ({ ok: status < 400, status, json: async () => body, text: async () => JSON.stringify(body) });
@@ -114,4 +115,14 @@ test('write with empty plan sends nothing', async () => {
 test('url points at the sheet', () => {
   const h = harness(() => undefined);
   assert.equal(h.store.url('S'), 'https://docs.google.com/spreadsheets/d/S/edit');
+});
+
+test('403 for missing scopes throws DriveAccessMissing', async () => {
+  const insufficient = { error: { code: 403, status: 'PERMISSION_DENIED', details: [{ reason: 'ACCESS_TOKEN_SCOPE_INSUFFICIENT' }] } };
+  const h = harness(() => json(insufficient, 403));
+  await assert.rejects(h.store.readAll('S'), DriveAccessMissing);
+  const drive = harness(() => json({ error: { code: 403, errors: [{ reason: 'insufficientPermissions' }] } }, 403));
+  await assert.rejects(drive.store.findOrCreate(), DriveAccessMissing);
+  const other = harness(() => json({ error: { code: 403, errors: [{ reason: 'rateLimitExceeded' }] } }, 403));
+  await assert.rejects(other.store.findOrCreate(), err => err instanceof ApiError && err.status === 403);
 });
