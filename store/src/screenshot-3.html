@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Screenshot 3</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .device { position: absolute; top: 260px; width: 470px; }
+  .device .screen { background: #1e293b; border-radius: 16px 16px 4px 4px; padding: 14px; height: 300px; overflow: hidden; }
+  .device .base { height: 16px; margin: 0 -24px; background: linear-gradient(#cbd5e1, #94a3b8); border-radius: 0 0 14px 14px; }
+  .device .popup { transform: scale(.567); border-radius: 10px; box-shadow: none; }
+  .device .label { margin-top: 20px; text-align: center; font-weight: 700; font-size: 19px; }
+  .device .label span { color: var(--muted); font-weight: 600; }
+
+  .hub { position: absolute; left: 560px; top: 330px; width: 160px; text-align: center; }
+  .hub .cloud {
+    width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; background: #fff; color: var(--blue-700);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 20px 50px -12px rgba(11,42,91,.35), 0 0 0 10px rgba(59,130,246,.12);
+  }
+  .hub .cloud .i { width: 60px; height: 60px; }
+  .hub .t { margin-top: 18px; font-weight: 800; font-size: 17px; line-height: 1.3; }
+  .link { position: absolute; top: 390px; width: 36px; border-top: 3px dashed var(--blue-500); }
+
+  .browsers { position: absolute; left: 0; right: 0; bottom: 48px; display: flex; justify-content: center; gap: 12px; }
+  .browsers span { padding: 8px 16px; border-radius: 999px; background: #fff; font-weight: 600; font-size: 15px; color: var(--muted); box-shadow: 0 0 0 1px var(--border); }
+</style></head>
+<body>
+  <div class="top-copy">
+    <h1>Same notes on <mark>every computer</mark></h1>
+    <p class="lead">Sign in with Google once. Notes you write at work are waiting at home.</p>
+  </div>
+
+  <div class="device" style="left:65px">
+    <div class="screen"><iframe class="popup" src="popup-demo.html"></iframe></div>
+    <div class="base"></div>
+    <div class="label">Work laptop <span>· Chrome</span></div>
+  </div>
+
+  <div class="link" style="left:542px"></div>
+  <div class="hub">
+    <div class="cloud"><svg class="i" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><path d="m9.5 14 2 2 4-4"/></svg></div>
+    <div class="t">Your<br>Google Drive</div>
+  </div>
+  <div class="link" style="left:702px"></div>
+
+  <div class="device" style="left:745px">
+    <div class="screen"><iframe class="popup" src="popup-demo.html"></iframe></div>
+    <div class="base"></div>
+    <div class="label">Home PC <span>· Edge</span></div>
+  </div>
+
+  <div class="browsers"><span>Chrome</span><span>Edge</span><span>Brave</span><span>Cốc Cốc</span><span>Other Chromium browsers</span></div>
+</body></html>

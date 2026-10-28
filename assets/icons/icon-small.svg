@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Toolbar-size icon (16px): icon.svg without the sync badge, note enlarged. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1d4ed8"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="128" height="128" rx="28" fill="url(#bg)"/>
+  <path d="M22 22h84v58L80 106H22z" fill="#fcc419"/>
+  <path d="M106 80H86a6 6 0 0 0-6 6v20z" fill="#e8a400"/>
+  <rect x="36" y="42" width="56" height="12" rx="6" fill="#7a5200"/>
+  <rect x="36" y="66" width="36" height="12" rx="6" fill="#b07a00"/>
+</svg>

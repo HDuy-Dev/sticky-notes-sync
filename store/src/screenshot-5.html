@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Screenshot 5</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .cards { position: absolute; left: 80px; right: 80px; top: 240px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .card { background: #fff; border-radius: 20px; padding: 32px 26px 40px; box-shadow: 0 0 0 1px var(--border), 0 18px 40px -20px rgba(11,42,91,.3); }
+  .card .ic { width: 60px; height: 60px; border-radius: 16px; background: var(--blue-100); color: var(--blue-700); display: flex; align-items: center; justify-content: center; }
+  .card .ic .i { width: 30px; height: 30px; }
+  .card:nth-child(2) .ic { background: var(--yellow-soft); color: #9a6700; }
+  .card:nth-child(3) .ic { background: #dcfce7; color: var(--green); }
+  .card:nth-child(4) .ic { background: #f3e8ff; color: #7e22ce; }
+  .card b { display: block; margin-top: 22px; font-size: 22px; }
+  .card p { margin: 10px 0 0; color: var(--muted); font-size: 17px; line-height: 1.5; font-weight: 500; }
+
+  .perm {
+    position: absolute; left: 80px; right: 80px; top: 580px; display: flex; align-items: center; gap: 18px;
+    padding: 22px 28px; border-radius: 20px; background: var(--blue-900); color: #fff;
+  }
+  .perm .i { color: var(--yellow); width: 30px; height: 30px; }
+  .perm b { font-size: 19px; }
+  .perm .tags { margin-left: auto; display: flex; gap: 10px; }
+  .perm .tags span { padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,.12); font-weight: 600; font-size: 15px; }
+</style></head>
+<body>
+  <div class="sticky" style="width:140px;height:140px;left:1150px;top:-40px;transform:rotate(10deg)"></div>
+
+  <div class="top-copy">
+    <h1>Private <mark>by design</mark></h1>
+    <p class="lead">Your notes stay in two places: your browser and your own Google Drive.</p>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+      <b>Only its own file</b><p>Opens only the spreadsheet it creates. The rest of your Drive stays off limits.</p>
+    </div>
+    <div class="card">
+      <div class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M2 2l20 20"/><path d="M5 5H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h7M15 11h5a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H9"/><path d="M4 13h16a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2"/></svg></div>
+      <b>No servers</b><p>No analytics, no ads. Nothing is ever sent to the developer.</p>
+    </div>
+    <div class="card">
+      <div class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.4a5 5 0 0 1 7 0"/><path d="M5 12.9a10 10 0 0 1 14 0"/><path d="M1.5 9.4a15 15 0 0 1 21 0"/></svg></div>
+      <b>Works offline</b><p>Every keystroke saves locally, then syncs when you're back online.</p>
+    </div>
+    <div class="card">
+      <div class="ic"><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></div>
+      <b>Free &amp; open source</b><p>MIT licensed. Every line of code is public on GitHub.</p>
+    </div>
+  </div>
+
+  <div class="perm">
+    <svg class="i" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <b>The only Google permissions it asks for</b>
+    <div class="tags"><span>Your email address</span><span>Files this app creates</span></div>
+  </div>
+</body></html>

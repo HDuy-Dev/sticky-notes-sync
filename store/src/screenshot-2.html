@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Screenshot 2</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .popup-wrap { left: 70px; top: 300px; }
+  .popup { transform: scale(.66); }
+  .arrow { position: absolute; left: 592px; top: 470px; color: var(--blue-700); }
+  .arrow .i { width: 72px; height: 72px; stroke-width: 2.5; }
+
+  .sheet {
+    position: absolute; left: 670px; top: 270px; width: 560px; background: #fff; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 40px 80px -20px rgba(11,42,91,.35), 0 0 0 1px rgba(11,42,91,.08); font-size: 14px;
+  }
+  .sheet .bar { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .sheet .file-ic { width: 32px; height: 32px; border-radius: 8px; background: var(--blue-700); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+  .sheet .file-ic .i { width: 20px; height: 20px; }
+  .sheet .crumb { color: var(--muted); font-size: 13px; font-weight: 600; }
+  .sheet .title { font-weight: 800; font-size: 17px; }
+  table { border-collapse: collapse; width: 100%; table-layout: fixed; font-family: Roboto, Arial, sans-serif; font-size: 13px; }
+  th, td { border: 1px solid #e3e7ee; padding: 7px 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  th { background: #f4f6fa; color: #5f6368; font-weight: 500; font-size: 12px; }
+  td.n, th.n { width: 34px; text-align: center; color: #5f6368; background: #f4f6fa; font-size: 12px; }
+  tr.head td:not(.n) { font-weight: 700; }
+  .tabs { display: flex; gap: 2px; padding: 8px 12px; background: #f4f6fa; border-top: 1px solid var(--border); font-size: 13px; font-weight: 600; }
+  .tabs span { padding: 6px 14px; border-radius: 6px 6px 0 0; color: var(--muted); }
+  .tabs span.on { background: #fff; color: var(--blue-700); box-shadow: inset 0 -2px 0 var(--blue-700); }
+  th.gap, td.gap { width: 26px; padding: 0; text-align: center; color: #9aa3b2; background: #f8f9fb; }
+  td.id { color: #9aa3b2; }
+  .note-cap { padding: 6px 18px 0; color: var(--muted); font-size: 12px; font-weight: 600; text-align: right; }
+</style></head>
+<body>
+  <div class="top-copy">
+    <h1>Notes saved to <mark>your Google Drive</mark></h1>
+    <p class="lead">Every note goes into a spreadsheet you own.<br>Open it, search it or back it up any time. No other server involved.</p>
+  </div>
+
+  <div class="popup-wrap"><iframe class="popup" src="popup-demo.html"></iframe></div>
+
+  <div class="arrow"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></div>
+
+  <div class="sheet">
+    <div class="bar">
+      <span class="file-ic"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></span>
+      <div><div class="crumb">My Drive</div><div class="title">Sticky Notes Sync</div></div>
+    </div>
+    <table>
+      <colgroup><col style="width:32px"><col style="width:56px"><col style="width:16px"><col style="width:76px"><col style="width:16px"><col><col style="width:16px"><col style="width:142px"></colgroup>
+      <tr><th class="n"></th><th>A</th><th class="gap">…</th><th>C</th><th class="gap">…</th><th>E</th><th class="gap">…</th><th>I</th></tr>
+      <tr class="head"><td class="n">1</td><td>id</td><td class="gap"></td><td>folder</td><td class="gap"></td><td>text</td><td class="gap"></td><td>updated</td></tr>
+      <tr><td class="n">2</td><td class="id">4f1c…</td><td class="gap"></td><td>Work</td><td class="gap"></td><td>Today Review Q4 roadmap…</td><td class="gap"></td><td>2026-10-28T10:42…</td></tr>
+      <tr><td class="n">3</td><td class="id">a83e…</td><td class="gap"></td><td>Work</td><td class="gap"></td><td>Meeting notes Launch moved…</td><td class="gap"></td><td>2026-10-28T10:45…</td></tr>
+      <tr><td class="n">4</td><td class="id">c07b…</td><td class="gap"></td><td>Work</td><td class="gap"></td><td>Ideas Weekly summary email…</td><td class="gap"></td><td>2026-10-28T09:12…</td></tr>
+      <tr><td class="n">5</td><td class="id">e5d2…</td><td class="gap"></td><td>Personal</td><td class="gap"></td><td>Groceries Milk, eggs, coffee…</td><td class="gap"></td><td>2026-10-26T18:30…</td></tr>
+      <tr><td class="n">6</td><td class="id">19a6…</td><td class="gap"></td><td>Ideas</td><td class="gap"></td><td>Trip plan Da Nang in March…</td><td class="gap"></td><td>2026-10-25T21:04…</td></tr>
+    </table>
+    <div class="note-cap">Simplified view · some columns hidden</div>
+    <div class="tabs"><span>Folders</span><span class="on">Notes</span></div>
+  </div>
+  <div class="chip" style="left:900px;top:228px"><span class="dot"></span>Synced automatically</div>
+</body></html>

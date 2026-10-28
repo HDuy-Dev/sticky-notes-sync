@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+:root {
+  --ink: #0b1b3a;
+  --muted: #475569;
+  --blue-900: #0b2a5b;
+  --blue-700: #1d4ed8;
+  --blue-500: #3b82f6;
+  --blue-100: #dbeafe;
+  --yellow: #fcc419;
+  --yellow-soft: #fff3bf;
+  --green: #188038;
+  --card: #fff;
+  --border: #e2e8f0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  width: 1280px; height: 800px; overflow: hidden; position: relative;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--ink);
+  background:
+    radial-gradient(900px 600px at 100% 0%, #fff6d6 0%, transparent 60%),
+    radial-gradient(900px 700px at 0% 100%, #dfe9ff 0%, transparent 60%),
+    #f6f8fc;
+}
+svg.i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+h1 { font-size: 56px; line-height: 1.08; letter-spacing: -1.5px; font-weight: 800; margin: 0; }
+h1 mark { background: none; color: var(--blue-700); position: relative; white-space: nowrap; }
+h1 mark::after {
+  content: ""; position: absolute; left: -4px; right: -4px; bottom: 4px; height: 16px;
+  background: var(--yellow); opacity: .55; z-index: -1; border-radius: 4px;
+}
+.lead { font-size: 22px; line-height: 1.5; color: var(--muted); margin: 20px 0 0; font-weight: 500; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px;
+  color: var(--blue-700); margin-bottom: 20px; letter-spacing: .2px;
+}
+.eyebrow img { width: 36px; height: 36px; }
+
+.checks { list-style: none; padding: 0; margin: 32px 0 0; display: grid; gap: 16px; }
+.checks li { display: flex; align-items: center; gap: 14px; font-size: 20px; font-weight: 600; }
+.checks .tick {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--blue-100); color: var(--blue-700);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.checks .tick svg { width: 18px; height: 18px; stroke-width: 3; }
+
+/* The real popup, embedded at 780x560 and scaled. */
+.popup {
+  width: 780px; height: 560px; border: 0; border-radius: 14px; display: block; background: #f2f5fa;
+  box-shadow: 0 40px 80px -20px rgba(11,42,91,.35), 0 0 0 1px rgba(11,42,91,.08);
+  transform-origin: top left;
+}
+.popup-wrap { position: absolute; }
+
+.chip {
+  position: absolute; display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px;
+  background: #fff; border-radius: 999px; font-weight: 700; font-size: 17px; white-space: nowrap;
+  box-shadow: 0 16px 40px -10px rgba(11,42,91,.3), 0 0 0 1px rgba(11,42,91,.06);
+}
+.chip .dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 4px #dcfce7; }
+
+/* Decorative sticky notes */
+.sticky { position: absolute; background: linear-gradient(#ffe066, #fcc419); border-radius: 4px 4px 4px 4px;
+  box-shadow: 0 14px 30px -12px rgba(122,82,0,.45); }
+
+.center { text-align: center; }
+.top-copy { position: absolute; left: 0; right: 0; top: 64px; text-align: center; padding: 0 120px; }
+.top-copy .lead { margin-top: 14px; }

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Marquee promo tile</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    width: 1400px; height: 560px; color: #fff;
+    background: radial-gradient(700px 400px at 100% 0%, rgba(252,196,25,.3), transparent 70%),
+                linear-gradient(135deg, #0b2a5b, #1d4ed8 65%, #3b82f6);
+  }
+  .copy { position: absolute; left: 90px; top: 120px; width: 560px; }
+  .eyebrow { color: #fff; font-size: 20px; }
+  .eyebrow img { width: 48px; height: 48px; }
+  h1 { font-size: 60px; }
+  h1 mark { color: var(--ink); background: var(--yellow); padding: 0 12px; border-radius: 10px; }
+  h1 mark::after { display: none; }
+  .lead { color: rgba(255,255,255,.85); }
+  .popup-wrap { left: 700px; top: 50px; }
+  .popup { transform: scale(.82); box-shadow: 0 40px 80px -20px rgba(0,0,0,.5); }
+</style></head>
+<body>
+  <div class="sticky" style="width:120px;height:120px;left:1280px;top:400px;transform:rotate(-8deg)"></div>
+  <div class="copy">
+    <div class="eyebrow"><img src="../../assets/icons/icon.svg" alt="">Sticky Notes Sync</div>
+    <h1>Sticky notes saved to <mark>Google Drive™</mark></h1>
+    <p class="lead">Free, private, and the same notes on every computer.</p>
+  </div>
+  <div class="popup-wrap"><iframe class="popup" src="popup-demo.html"></iframe></div>
+</body></html>

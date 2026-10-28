@@ -5,7 +5,7 @@
 <h1 align="center">Sticky Notes Sync</h1>
 
 <p align="center">
-  Quick formatted notes in your browser, synced to a Google Sheet in <b>your own</b> Google Drive.<br>
+  Sticky notes and a notepad in your browser, saved automatically to <b>your own</b> Google Drive.<br>
   No servers, no tracking, open source.
 </p>
 
@@ -15,7 +15,7 @@
   <a href="LICENSE">MIT License</a>
 </p>
 
-![Sticky Notes Sync popup with three notes in a Work folder](store/screenshot-1.png)
+![Sticky Notes Sync: sticky notes saved to your Google Drive](store/screenshot-1.png)
 
 ## Features
 

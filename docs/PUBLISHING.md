@@ -42,7 +42,7 @@ Reload the extension, open the popup → gear → **Sign in with Google**. Expec
 3. Upload. The store assigns the final ID (`<store-id>`). Add `https://<store-id>.chromiumapp.org/` to the OAuth client's redirect URIs.
 4. Listing:
    - Description: see "Store listing text" below.
-   - Icon: `assets/icons/icon-128.png`. Screenshots: `store/screenshot-1.png`, `store/screenshot-2.png` (1280×800).
+   - Icon: `assets/icons/icon-128.png`. Screenshots: `store/screenshot-1.png` … `store/screenshot-5.png` (1280×800, upload in order). Small promo tile: `store/promo-small.png` (440×280). Marquee promo tile: `store/promo-marquee.png` (1400×560).
    - Category: Productivity. Language: English.
    - Privacy practices tab: paste the single purpose and permission justifications from `docs/COMPLIANCE.md`. Data usage: declare **Personally identifiable information** (the email address). Note contents never reach the developer; if the form still asks, pick the closest category and say they are stored only in the user's own browser and Google Drive. Re-read the form's current wording when submitting, since categories change. Tick the three Limited Use certifications.
    - Privacy policy URL: same as the OAuth consent screen.
@@ -58,16 +58,74 @@ Replace `[CONTACT_EMAIL]` in `PRIVACY.md` and `docs/privacy.html` first.
 
 ## Store listing text
 
-> **Sticky Notes Sync** — quick formatted notes in your browser, synced to a Google Sheet in your own Drive.
+The store name and short description come from `_locales/<lang>/messages.json` (`extName`, max 75 characters; `extDescription`, max 132), referenced by `manifest.json`. English is the default; Vietnamese (`vi`) is shown to users whose browser language is Vietnamese. The name leads with the brand and then the words people search for: "sticky notes", "notepad", "Google Drive".
+
+Detailed description (paste into the dashboard). Keep "Google Drive" to at most 5 mentions; the spam policy flags a keyword repeated more than 5 times.
+
+> Sticky notes and a notepad in your browser, saved automatically to your own Google Drive.
 >
-> • Organise notes in folder tabs, up to three side-by-side notes per folder
-> • Bold, italic, underline, colors and clickable links; pasting keeps simple formatting
-> • Works offline; everything saves automatically
-> • Sign in with Google to sync between computers. Notes live in a "Sticky Notes Sync" spreadsheet in your own Drive
-> • Private by design: the extension can only access files it creates, and no data is sent to the developer
+> Write a quick note, close the popup, and it's already saved. Sign in with Google once and every note is backed up to a spreadsheet in your Drive, so the same notes are waiting on every computer you use: work laptop, home PC, Chrome, Edge or Brave.
+>
+> WHY GOOGLE DRIVE?
+> • Your notes belong to you: they live in a "Sticky Notes Sync" spreadsheet in your Drive, not on someone else's server
+> • Open, search, export or back up your notes from Drive any time
+> • Sync across all your computers, automatically, a couple of seconds after you type
+> • Keep your notes even if you reinstall the browser or switch computers
+>
+> FEATURES
+> • Folder tabs, with up to three notes side by side in each folder
+> • Bold, italic, underline, six text colors and clickable links
+> • Paste from web pages and keep simple formatting
+> • Copy a whole note in one click
+> • Saves as you type and works offline
+> • Sign-in is optional: notes work locally without an account
+> • Works in Chrome, Edge, Brave, Cốc Cốc and other Chromium browsers
+>
+> PRIVATE BY DESIGN
+> • Only asks for your email address and access to files it creates (drive.file). It cannot see any other file in your Drive
+> • No servers, no analytics, no ads. Nothing is sent to the developer
+> • Free and open source (MIT): https://github.com/HDuy-Dev/sticky-notes-sync
+>
+> Great as a quick notepad, to-do list, meeting notes, scratch pad or clipboard for snippets you reuse.
 >
 > Not affiliated with Google. Google Drive and Google Sheets are trademarks of Google LLC.
 
-## Icons
+Vietnamese detailed description (dashboard → Store listing → add language "Tiếng Việt", paste below, reuse the same images):
 
-`assets/icons/icon.svg` is the source. The PNGs were rendered from it with headless Chromium at 16, 32, 48 and 128 px; re-render after editing the SVG.
+> Ghi chú dán (sticky notes) và notepad ngay trên trình duyệt, tự động lưu vào Google Drive của chính bạn.
+>
+> Viết một ghi chú nhanh, đóng cửa sổ là đã lưu. Đăng nhập Google một lần, mọi ghi chú được sao lưu vào một bảng tính trong Drive của bạn, nên máy ở công ty hay ở nhà đều thấy cùng một nội dung: Chrome, Edge, Brave hay Cốc Cốc.
+>
+> VÌ SAO LƯU VÀO GOOGLE DRIVE?
+> • Ghi chú là của bạn: nằm trong bảng tính "Sticky Notes Sync" trong Drive, không nằm trên máy chủ của ai khác
+> • Mở, tìm kiếm, xuất hoặc sao lưu ghi chú từ Drive bất cứ lúc nào
+> • Tự đồng bộ giữa các máy tính vài giây sau khi bạn gõ
+> • Cài lại trình duyệt hay đổi máy vẫn còn nguyên ghi chú
+>
+> TÍNH NĂNG
+> • Thư mục dạng tab, mỗi thư mục tối đa ba ghi chú đặt cạnh nhau
+> • In đậm, in nghiêng, gạch chân, sáu màu chữ và liên kết bấm được
+> • Dán từ trang web vẫn giữ định dạng đơn giản
+> • Sao chép cả ghi chú chỉ với một cú bấm
+> • Tự lưu khi gõ, dùng được khi không có mạng
+> • Không bắt buộc đăng nhập: ghi chú vẫn dùng được trên máy mà không cần tài khoản
+>
+> RIÊNG TƯ NGAY TỪ THIẾT KẾ
+> • Chỉ xin địa chỉ email và quyền với các file do chính tiện ích tạo (drive.file). Không thể xem bất kỳ file nào khác trong Drive
+> • Không máy chủ, không thống kê, không quảng cáo. Không dữ liệu nào được gửi cho nhà phát triển
+> • Miễn phí, mã nguồn mở (MIT): https://github.com/HDuy-Dev/sticky-notes-sync
+>
+> Phù hợp làm notepad nhanh, danh sách việc cần làm, ghi chú cuộc họp, nháp hay lưu các đoạn văn bản hay dùng.
+>
+> Không liên kết với Google. Google Drive và Google Sheets là thương hiệu của Google LLC.
+
+## Icons and store images
+
+`assets/icons/icon.svg` is the source (`icon-small.svg`, without the sync badge, is used for the 16 px toolbar icon; the 128 px icon keeps 16 px of transparent padding per side as the store asks). Store images are HTML pages in `store/src/` that embed `popup-demo.html`, a static copy of the popup styled by the real `popup.css`. After editing either, run:
+
+```sh
+scripts/render-store-images.sh            # all store images and icon PNGs
+scripts/render-store-images.sh icons      # only assets/icons/icon-*.png
+```
+
+It needs Google Chrome (override the path with `CHROME=...`) and a network connection for the Plus Jakarta Sans web font. Copy `assets/icons/icon-128.png` to `docs/icon.png` and `store/screenshot-1.png` to `docs/screenshot.png` to refresh the website.

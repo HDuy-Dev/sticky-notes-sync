@@ -14,7 +14,7 @@ OUT="dist/sticky-notes-sync-$VERSION.zip"
 STAGE=$(mktemp -d)
 trap 'rm -rf "$STAGE"' EXIT
 
-cp -R src assets LICENSE "$STAGE/"
+cp -R src assets _locales LICENSE "$STAGE/"
 node -e "
   const m = require('./manifest.json');
   delete m.key;

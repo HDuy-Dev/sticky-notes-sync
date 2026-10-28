@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Sticky Notes Sync – Notepad saved to Google Drive"
+  },
+  "extShortName": {
+    "message": "Sticky Notes Sync"
+  },
+  "extDescription": {
+    "message": "Sticky notes & notepad that auto-save to your own Google Drive and sync across your computers. Folders, rich text, offline. Free."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extName": {
+    "message": "Sticky Notes Sync – Ghi chú lưu vào Google Drive"
+  },
+  "extShortName": {
+    "message": "Sticky Notes Sync"
+  },
+  "extDescription": {
+    "message": "Ghi chú dán & notepad trên trình duyệt, tự lưu vào Google Drive của bạn và đồng bộ giữa các máy tính. Miễn phí, riêng tư."
+  }
+}

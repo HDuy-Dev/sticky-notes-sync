@@ -10,7 +10,7 @@ What was checked before publishing, and how each point is met. This is a practic
 | Original visuals | Icon (`assets/icons/icon.svg`) and UI were designed for this project. Screenshots show the extension itself with made-up sample notes. |
 | Third-party code | None. No npm dependencies, no bundled libraries or fonts (system font stack). |
 | Licence | MIT (`LICENSE`). |
-| Name | "Sticky Notes Sync": no extension with this exact name was found in a web search on 2026-10-27. "Sticky notes" is a generic description; the name contains no third-party brand. A formal trademark search is recommended if the product becomes commercial. |
+| Name | Brand "Sticky Notes Sync": no extension with this exact name was found in a web search on 2026-10-27. "Sticky notes" is a generic description. The store name "Sticky Notes Sync – Notepad saved to Google Drive" names Google Drive only to say where notes are stored (nominative use); the listing, popup and privacy policy all state that the extension is not affiliated with Google, and no Google logo is used in the icon or store images. The OAuth consent screen keeps the name "Sticky Notes Sync", since Google does not allow "Google" in OAuth app names. A formal trademark search is recommended if the product becomes commercial. |
 
 ## Google branding and trademarks
 

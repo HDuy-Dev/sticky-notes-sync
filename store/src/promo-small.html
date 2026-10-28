@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Small promo tile</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Shown at about 220x140 in the store: one message, large type. */
+  body {
+    width: 440px; height: 280px; color: #fff;
+    background: radial-gradient(300px 220px at 100% 0%, rgba(252,196,25,.35), transparent 70%),
+                linear-gradient(135deg, #0b2a5b, #1d4ed8 70%, #3b82f6);
+  }
+  .brand { position: absolute; left: 34px; top: 34px; display: flex; align-items: center; gap: 14px; font-size: 24px; font-weight: 800; letter-spacing: -.3px; }
+  .brand img { width: 60px; height: 60px; filter: drop-shadow(0 10px 16px rgba(0,0,0,.3)); }
+  .tag { position: absolute; left: 34px; right: 24px; top: 128px; font-size: 40px; font-weight: 800; line-height: 1.12; letter-spacing: -1px; }
+  .tag mark { white-space: nowrap; background: var(--yellow); color: var(--ink); padding: 0 10px; border-radius: 8px; }
+</style></head>
+<body>
+  <div class="brand"><img src="../../assets/icons/icon.svg" alt="">Sticky Notes Sync</div>
+  <div class="tag">Saved to<br><mark>Google Drive™</mark></div>
+</body></html>
