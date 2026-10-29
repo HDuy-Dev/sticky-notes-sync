@@ -114,11 +114,25 @@ export function initEditor({ toolbarEl, onNoteInput }) {
     if (!url) return closeLink();
     url = withScheme(url);
     closeLink();
-    if (savedRange && !savedRange.collapsed) {
+    // A selected URL is the link's text too: replace it with the new address
+    // (the whole link when it sits inside one) instead of only changing href.
+    const selectedUrl = savedRange && /^https?:\/\//i.test(String(savedRange).trim());
+    if (selectedUrl) {
+      const sel = getSelection();
+      const node = sel.rangeCount ? sel.getRangeAt(0).commonAncestorContainer : null;
+      const a = (node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement)?.closest('a');
+      if (a && lastBody.contains(a)) {
+        const r = document.createRange();
+        r.selectNode(a);
+        sel.removeAllRanges();
+        sel.addRange(r);
+      }
+    }
+    if (savedRange && !savedRange.collapsed && !selectedUrl) {
       document.execCommand('createLink', false, url);
     } else {
       const safe = escapeHtml(url);
-      document.execCommand('insertHTML', false, sanitizeHtml(`<a href="${safe}">${safe}</a>`) + '&nbsp;');
+      document.execCommand('insertHTML', false, sanitizeHtml(`<a href="${safe}">${safe}</a>`) + (selectedUrl ? '' : '&nbsp;'));
     }
     changed();
   }
